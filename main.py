@@ -33,9 +33,21 @@ def build_page_url(page_number):
     return f"{BASE_URL}_Desde_{offset}"
 
 
-def fetch_page(url):
+def create_session():
+    """Create a requests session with browser-like headers."""
+    session = requests.Session()
+    session.headers.update(HEADERS)
+    # Visit the homepage first to get cookies
+    try:
+        session.get("https://www.mercadolibre.com.ar/", timeout=REQUEST_TIMEOUT)
+    except requests.RequestException:
+        pass
+    return session
+
+
+def fetch_page(session, url):
     """Fetch a single page and return its HTML content."""
-    response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
+    response = session.get(url, timeout=REQUEST_TIMEOUT)
     response.raise_for_status()
     return response.text
 
@@ -118,19 +130,32 @@ def parse_page(html):
 def fetch_all_listings():
     """Fetch all BAIC listings across all pages."""
     all_listings = []
+    session = create_session()
 
     for page in range(1, MAX_PAGES + 1):
         url = build_page_url(page)
         print(f"Pagina {page}: {url}")
 
         try:
-            html = fetch_page(url)
+            html = fetch_page(session, url)
         except requests.RequestException as e:
             print(f"  Error en pagina {page}: {e}")
             break
 
         listings = parse_page(html)
         print(f"  {len(listings)} publicaciones encontradas")
+
+        # Debug: if first page returns 0 listings, log what we got
+        if page == 1 and not listings:
+            print("  DEBUG: No listings found on page 1. HTML info:")
+            print(f"  DEBUG: HTML length: {len(html)}")
+            print(f"  DEBUG: Contains 'ui-search-layout__item': {'ui-search-layout__item' in html}")
+            print(f"  DEBUG: Contains 'poly-card': {'poly-card' in html}")
+            print(f"  DEBUG: Contains 'poly-component__title': {'poly-component__title' in html}")
+            print(f"  DEBUG: Contains 'captcha': {'captcha' in html.lower()}")
+            print(f"  DEBUG: Contains 'challenge': {'challenge' in html.lower()}")
+            print(f"  DEBUG: First 2000 chars of HTML:")
+            print(html[:2000])
 
         if not listings:
             break
