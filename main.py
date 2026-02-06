@@ -145,17 +145,24 @@ def fetch_all_listings():
         listings = parse_page(html)
         print(f"  {len(listings)} publicaciones encontradas")
 
-        # Debug: if first page returns 0 listings, log what we got
+        # Debug: if first page returns 0 listings, check for embedded JSON data
         if page == 1 and not listings:
-            print("  DEBUG: No listings found on page 1. HTML info:")
+            print("  DEBUG: No poly-card HTML found. Checking for embedded JSON...")
             print(f"  DEBUG: HTML length: {len(html)}")
-            print(f"  DEBUG: Contains 'ui-search-layout__item': {'ui-search-layout__item' in html}")
-            print(f"  DEBUG: Contains 'poly-card': {'poly-card' in html}")
-            print(f"  DEBUG: Contains 'poly-component__title': {'poly-component__title' in html}")
-            print(f"  DEBUG: Contains 'captcha': {'captcha' in html.lower()}")
-            print(f"  DEBUG: Contains 'challenge': {'challenge' in html.lower()}")
-            print(f"  DEBUG: First 2000 chars of HTML:")
-            print(html[:2000])
+            print(f"  DEBUG: Contains '__PRELOADED_STATE__': {'__PRELOADED_STATE__' in html}")
+            print(f"  DEBUG: Contains 'application/ld+json': {'application/ld+json' in html}")
+            print(f"  DEBUG: Contains 'itemListElement': {'itemListElement' in html}")
+            # Search for any script tags with data
+            script_patterns = re.findall(r'<script[^>]*>(window\.__PRELOADED_STATE__|var __PRELOADED_STATE__)', html)
+            print(f"  DEBUG: Preloaded state scripts found: {len(script_patterns)}")
+            # Check for JSON-LD
+            jsonld_matches = re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
+            print(f"  DEBUG: JSON-LD blocks found: {len(jsonld_matches)}")
+            for i, block in enumerate(jsonld_matches[:3]):
+                print(f"  DEBUG: JSON-LD block {i} (first 500 chars): {block[:500]}")
+            # Check for other data patterns
+            print(f"  DEBUG: Contains 'results': {'\"results\"' in html}")
+            print(f"  DEBUG: Contains 'MLA-': {'MLA-' in html}")
 
         if not listings:
             break
