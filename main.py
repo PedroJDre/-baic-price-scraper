@@ -50,6 +50,7 @@ def fetch_page(url, retries=3):
                     "api_key": SCRAPERAPI_KEY,
                     "url": url,
                     "render": "true",
+                    "country_code": "ar",
                 })
                 api_url = f"{SCRAPERAPI_URL}?{params}"
                 response = requests.get(api_url, timeout=REQUEST_TIMEOUT)
@@ -163,6 +164,12 @@ def fetch_all_listings():
         print(f"  {len(listings)} publicaciones encontradas")
 
         if not listings:
+            if page == 1:
+                # Debug: show what ScraperAPI returned so we can diagnose
+                print(f"  DEBUG: HTML length = {len(html)}")
+                print(f"  DEBUG: Has 'ui-search-layout': {'ui-search-layout' in html}")
+                print(f"  DEBUG: Has 'poly-card': {'poly-card' in html}")
+                print(f"  DEBUG: First 500 chars: {html[:500]}")
             break
 
         all_listings.extend(listings)
