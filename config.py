@@ -5,7 +5,7 @@ BASE_URL = "https://autos.mercadolibre.com.ar/baic/"
 ITEMS_PER_PAGE = 48
 MAX_PAGES = 20  # Safety cap: 20 pages * 48 = 960 listings max
 REQUEST_DELAY_SECONDS = 2.0
-REQUEST_TIMEOUT = 60  # ScraperAPI can be slower
+REQUEST_TIMEOUT = 90  # ScraperAPI with render=true is slower
 
 HEADERS = {
     "User-Agent": (
