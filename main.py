@@ -6,6 +6,7 @@ import ssl
 from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from urllib.parse import urlencode
 
 import requests
 
@@ -16,6 +17,8 @@ from config import (
     REQUEST_DELAY_SECONDS,
     REQUEST_TIMEOUT,
     HEADERS,
+    SCRAPERAPI_KEY,
+    SCRAPERAPI_URL,
     SMTP_SERVER,
     SMTP_PORT,
     EMAIL_SENDER,
@@ -33,21 +36,14 @@ def build_page_url(page_number):
     return f"{BASE_URL}_Desde_{offset}"
 
 
-def create_session():
-    """Create a requests session with browser-like headers."""
-    session = requests.Session()
-    session.headers.update(HEADERS)
-    # Visit the homepage first to get cookies
-    try:
-        session.get("https://www.mercadolibre.com.ar/", timeout=REQUEST_TIMEOUT)
-    except requests.RequestException:
-        pass
-    return session
-
-
-def fetch_page(session, url):
-    """Fetch a single page and return its HTML content."""
-    response = session.get(url, timeout=REQUEST_TIMEOUT)
+def fetch_page(url):
+    """Fetch a single page, using ScraperAPI if key is configured."""
+    if SCRAPERAPI_KEY:
+        params = urlencode({"api_key": SCRAPERAPI_KEY, "url": url, "render": "true"})
+        api_url = f"{SCRAPERAPI_URL}?{params}"
+        response = requests.get(api_url, timeout=REQUEST_TIMEOUT)
+    else:
+        response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
     response.raise_for_status()
     return response.text
 
@@ -130,39 +126,24 @@ def parse_page(html):
 def fetch_all_listings():
     """Fetch all BAIC listings across all pages."""
     all_listings = []
-    session = create_session()
+
+    if SCRAPERAPI_KEY:
+        print("Usando ScraperAPI para las solicitudes")
+    else:
+        print("ScraperAPI no configurado, usando solicitudes directas")
 
     for page in range(1, MAX_PAGES + 1):
         url = build_page_url(page)
         print(f"Pagina {page}: {url}")
 
         try:
-            html = fetch_page(session, url)
+            html = fetch_page(url)
         except requests.RequestException as e:
             print(f"  Error en pagina {page}: {e}")
             break
 
         listings = parse_page(html)
         print(f"  {len(listings)} publicaciones encontradas")
-
-        # Debug: if first page returns 0 listings, check for embedded JSON data
-        if page == 1 and not listings:
-            print("  DEBUG: No poly-card HTML found. Checking for embedded JSON...")
-            print(f"  DEBUG: HTML length: {len(html)}")
-            print(f"  DEBUG: Contains '__PRELOADED_STATE__': {'__PRELOADED_STATE__' in html}")
-            print(f"  DEBUG: Contains 'application/ld+json': {'application/ld+json' in html}")
-            print(f"  DEBUG: Contains 'itemListElement': {'itemListElement' in html}")
-            # Search for any script tags with data
-            script_patterns = re.findall(r'<script[^>]*>(window\.__PRELOADED_STATE__|var __PRELOADED_STATE__)', html)
-            print(f"  DEBUG: Preloaded state scripts found: {len(script_patterns)}")
-            # Check for JSON-LD
-            jsonld_matches = re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL)
-            print(f"  DEBUG: JSON-LD blocks found: {len(jsonld_matches)}")
-            for i, block in enumerate(jsonld_matches[:3]):
-                print(f"  DEBUG: JSON-LD block {i} (first 500 chars): {block[:500]}")
-            # Check for other data patterns
-            print(f"  DEBUG: Contains 'results': {'\"results\"' in html}")
-            print(f"  DEBUG: Contains 'MLA-': {'MLA-' in html}")
 
         if not listings:
             break

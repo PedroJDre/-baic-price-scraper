@@ -4,8 +4,8 @@ import os
 BASE_URL = "https://autos.mercadolibre.com.ar/baic/"
 ITEMS_PER_PAGE = 48
 MAX_PAGES = 20  # Safety cap: 20 pages * 48 = 960 listings max
-REQUEST_DELAY_SECONDS = 1.0
-REQUEST_TIMEOUT = 20
+REQUEST_DELAY_SECONDS = 2.0
+REQUEST_TIMEOUT = 60  # ScraperAPI can be slower
 
 HEADERS = {
     "User-Agent": (
@@ -15,6 +15,10 @@ HEADERS = {
     ),
     "Accept-Language": "es-AR,es;q=0.9",
 }
+
+# --- ScraperAPI ---
+SCRAPERAPI_KEY = os.environ.get("SCRAPERAPI_KEY", "")
+SCRAPERAPI_URL = "https://api.scraperapi.com"
 
 # --- Email ---
 SMTP_SERVER = "smtp.gmail.com"

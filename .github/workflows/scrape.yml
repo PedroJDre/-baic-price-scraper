@@ -27,4 +27,5 @@ jobs:
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           EMAIL_RECIPIENTS: ${{ secrets.EMAIL_RECIPIENTS }}
+          SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
         run: python main.py
