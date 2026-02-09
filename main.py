@@ -245,13 +245,48 @@ def _merge_similar_groups(grouped, cutoff=0.7):
     return dict(sorted(result.items()))
 
 
+def _strip_model_prefix(title, model):
+    """Remove 'Baic MODEL' prefix from title to get just the variant info."""
+    cleaned = re.sub(rf'^Baic\s+{re.escape(model)}\s*', '', title, flags=re.IGNORECASE).strip()
+    return cleaned or title
+
+
+_SUBCAT_PATTERNS = [
+    (r'\bPlus\b', 'Plus'),
+    (r'\bPro\b', 'Pro'),
+    (r'\b(?:Ii|Il|II)\b', 'II'),
+    (r'\bSe\b', 'SE'),
+    (r'\bElite\b', 'Elite'),
+    (r'\bHonor\b', 'Honor'),
+    (r'\bFashion\b', 'Fashion'),
+    (r'\b(?:Comfort|Confort)\b', 'Comfort'),
+    (r'\b4[wx][d4]\b', '4WD'),
+    (r'\b2[wW][dD]\b', '2WD'),
+    (r'\b(?:Electric[oa]?|100%\s*Electrico)\b', 'Electrico'),
+    (r'\b(?:Mhev|Milhybrid|Hybrid|H[ií]brida?)\b', 'Hybrid'),
+]
+
+
+def extract_subcategory(variant):
+    """Extract a subcategory keyword from a variant name."""
+    for pattern, label in _SUBCAT_PATTERNS:
+        if re.search(pattern, variant, re.IGNORECASE):
+            return label
+    return "Otros"
+
+
 def process_listings(items):
-    """Group listings by base model, merge similar groups, sort by price."""
+    """Group listings by base model, merge similar groups, sort by price.
+
+    Each item gets a 'subcategory' field added for sub-grouping.
+    """
     grouped = {}
 
     for item in items:
         title = item.get("title", "Sin titulo") or "Sin titulo"
         model = extract_base_model(title)
+        variant = _strip_model_prefix(title, model)
+        item["subcategory"] = extract_subcategory(variant)
         grouped.setdefault(model, []).append(item)
 
     # Merge groups with similar names (e.g. BJ30E into BJ30)
@@ -296,12 +331,6 @@ def format_plain_text(grouped):
     return "\n".join(lines)
 
 
-def _strip_model_prefix(title, model):
-    """Remove 'Baic MODEL' prefix from title to get just the variant info."""
-    cleaned = re.sub(rf'^Baic\s+{re.escape(model)}\s*', '', title, flags=re.IGNORECASE).strip()
-    return cleaned or title
-
-
 def _price_range_str(entries):
     """Return a 'min - max' price range string for a group of entries."""
     prices = [e for e in entries if e["price"] > 0]
@@ -324,46 +353,80 @@ def format_html_email(grouped):
     date_str = datetime.now().strftime('%d/%m/%Y %H:%M')
     total_listings = sum(len(v) for v in grouped.values())
 
-    # --- summary cards (one per model) ---
+    # --- summary cards with anchor links ---
     summary_cards = []
     for model, entries in grouped.items():
+        anchor = model.lower()
         summary_cards.append(
             f'<td style="padding:0 6px 12px 6px;text-align:center;">'
+            f'<a href="#{anchor}" style="text-decoration:none;color:#ffffff;">'
             f'<div style="background-color:#1a237e;border-radius:8px;padding:14px 18px;min-width:100px;">'
             f'<div style="font-size:20px;font-weight:700;letter-spacing:0.5px;">{model}</div>'
             f'<div style="font-size:12px;margin-top:4px;opacity:0.85;">'
             f'{len(entries)} pub.</div>'
-            f'</div></td>'
+            f'</div></a></td>'
         )
     summary_cards_html = "".join(summary_cards)
 
-    # --- model sections ---
+    # Column header template
+    th_style = ('padding:10px 14px;font-weight:600;color:#37474f;'
+                'border-bottom:2px solid #c5cae9;font-size:12px;'
+                'text-transform:uppercase;letter-spacing:0.5px;')
+
+    # --- model sections with subcategories ---
     sections = []
     for model, entries in grouped.items():
+        anchor = model.lower()
         price_range = _price_range_str(entries)
 
-        rows = []
-        for i, entry in enumerate(entries):
-            bg = "#f4f6fb" if i % 2 == 0 else "#ffffff"
-            price_str = _format_price(entry)
-            variant = _strip_model_prefix(entry["title"], model)
-            seller = entry["seller"] if entry["seller"] != "N/A" else '<span style="color:#999;">—</span>'
-            location = entry["location"] if entry["location"] else '<span style="color:#999;">—</span>'
+        # Group entries by subcategory
+        subcats = {}
+        for entry in entries:
+            sc = entry.get("subcategory", "Otros")
+            subcats.setdefault(sc, []).append(entry)
 
-            rows.append(
-                f'<tr style="background-color:{bg};">'
-                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;">{variant}</td>'
-                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#444;">{seller}</td>'
-                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:right;'
-                f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}</td>'
-                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#555;">{location}</td>'
-                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:center;">'
-                f'<a href="{entry["url"]}" target="_blank" style="display:inline-block;'
-                f'background-color:#2962ff;color:#ffffff;padding:5px 12px;border-radius:4px;'
-                f'font-size:12px;font-weight:600;text-decoration:none;">Ver</a></td>'
-                f'</tr>'
+        # Build sub-tables for each subcategory
+        subcat_html_parts = []
+        for sc_name, sc_entries in subcats.items():
+            sc_count = len(sc_entries)
+            sc_range = _price_range_str(sc_entries)
+            range_text = f' &mdash; {sc_range}' if sc_range else ''
+
+            rows = []
+            for i, entry in enumerate(sc_entries):
+                bg = "#f4f6fb" if i % 2 == 0 else "#ffffff"
+                price_str = _format_price(entry)
+                variant = _strip_model_prefix(entry["title"], model)
+                seller = entry["seller"] if entry["seller"] != "N/A" else '<span style="color:#999;">\u2014</span>'
+                location = entry["location"] if entry["location"] else '<span style="color:#999;">\u2014</span>'
+
+                rows.append(
+                    f'<tr style="background-color:{bg};">'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;">{variant}</td>'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#444;">{seller}</td>'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:right;'
+                    f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}</td>'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#555;">{location}</td>'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:center;">'
+                    f'<a href="{entry["url"]}" target="_blank" style="display:inline-block;'
+                    f'background-color:#2962ff;color:#ffffff;padding:5px 12px;border-radius:4px;'
+                    f'font-size:12px;font-weight:600;text-decoration:none;">Ver</a></td>'
+                    f'</tr>'
+                )
+            rows_html = "\n".join(rows)
+
+            # Subcategory header row + table
+            subcat_html_parts.append(
+                # sub-header
+                f'<tr><td colspan="5" style="background-color:#e8eaf6;padding:8px 14px;'
+                f'font-weight:700;color:#283593;font-size:13px;border-bottom:1px solid #c5cae9;">'
+                f'{sc_name} '
+                f'<span style="font-weight:400;color:#5c6bc0;">({sc_count}){range_text}</span>'
+                f'</td></tr>'
+                + rows_html
             )
-        rows_html = "\n".join(rows)
+
+        all_rows_html = "\n".join(subcat_html_parts)
 
         range_badge = ""
         if price_range:
@@ -373,7 +436,7 @@ def format_html_email(grouped):
             )
 
         sections.append(
-            f'<div style="margin-bottom:32px;">'
+            f'<div id="{anchor}" style="margin-bottom:32px;">'
             # section header
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border:none;">'
             f'<tr><td style="background-color:#0d47a1;padding:14px 20px;'
@@ -383,22 +446,17 @@ def format_html_email(grouped):
             f'padding:2px 10px;border-radius:12px;margin-left:6px;">{len(entries)}</span>'
             f'{range_badge}'
             f'</td></tr></table>'
-            # data table
+            # data table with subcategory rows
             f'<table width="100%" cellpadding="0" cellspacing="0" '
             f'style="border-collapse:collapse;border:1px solid #dde2ea;border-top:none;font-size:13px;">'
             f'<thead><tr style="background-color:#e8eaf6;">'
-            f'<th style="padding:10px 14px;text-align:left;font-weight:600;color:#37474f;'
-            f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Variante</th>'
-            f'<th style="padding:10px 14px;text-align:left;font-weight:600;color:#37474f;'
-            f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Vendedor</th>'
-            f'<th style="padding:10px 14px;text-align:right;font-weight:600;color:#37474f;'
-            f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Precio</th>'
-            f'<th style="padding:10px 14px;text-align:left;font-weight:600;color:#37474f;'
-            f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Ubicaci\u00f3n</th>'
-            f'<th style="padding:10px 14px;text-align:center;font-weight:600;color:#37474f;'
-            f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Link</th>'
+            f'<th style="{th_style}text-align:left;">Variante</th>'
+            f'<th style="{th_style}text-align:left;">Vendedor</th>'
+            f'<th style="{th_style}text-align:right;">Precio</th>'
+            f'<th style="{th_style}text-align:left;">Ubicaci\u00f3n</th>'
+            f'<th style="{th_style}text-align:center;">Link</th>'
             f'</tr></thead>'
-            f'<tbody>{rows_html}</tbody>'
+            f'<tbody>{all_rows_html}</tbody>'
             f'</table>'
             f'</div>'
         )
