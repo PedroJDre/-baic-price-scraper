@@ -51,6 +51,7 @@ def fetch_page(url, retries=3):
                     "url": url,
                     "render": "true",
                     "country_code": "ar",
+                    "wait_for_selector": "li.ui-search-layout__item",
                 })
                 api_url = f"{SCRAPERAPI_URL}?{params}"
                 response = requests.get(api_url, timeout=REQUEST_TIMEOUT)
