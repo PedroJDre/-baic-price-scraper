@@ -352,13 +352,15 @@ def format_html_email(grouped):
 
             rows.append(
                 f'<tr style="background-color:{bg};">'
-                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;">'
-                f'<a href="{entry["url"]}" style="color:#2962ff;text-decoration:none;font-weight:500;"'
-                f' target="_blank">{variant}</a></td>'
+                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;">{variant}</td>'
                 f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#444;">{seller}</td>'
                 f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:right;'
                 f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}</td>'
                 f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#555;">{location}</td>'
+                f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:center;">'
+                f'<a href="{entry["url"]}" target="_blank" style="display:inline-block;'
+                f'background-color:#2962ff;color:#ffffff;padding:5px 12px;border-radius:4px;'
+                f'font-size:12px;font-weight:600;text-decoration:none;">Ver</a></td>'
                 f'</tr>'
             )
         rows_html = "\n".join(rows)
@@ -393,6 +395,8 @@ def format_html_email(grouped):
             f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Precio</th>'
             f'<th style="padding:10px 14px;text-align:left;font-weight:600;color:#37474f;'
             f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Ubicaci\u00f3n</th>'
+            f'<th style="padding:10px 14px;text-align:center;font-weight:600;color:#37474f;'
+            f'border-bottom:2px solid #c5cae9;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Link</th>'
             f'</tr></thead>'
             f'<tbody>{rows_html}</tbody>'
             f'</table>'
