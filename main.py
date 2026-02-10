@@ -37,27 +37,43 @@ def build_page_url(page_number):
     return f"{BASE_URL}_Desde_{offset}"
 
 
+def _scraperapi_request(url, use_wait_for_selector=True):
+    """Make a single ScraperAPI request. Returns response object."""
+    params = {
+        "api_key": SCRAPERAPI_KEY,
+        "url": url,
+        "render": "true",
+        "country_code": "ar",
+    }
+    if use_wait_for_selector:
+        params["wait_for_selector"] = "li.ui-search-layout__item"
+    api_url = f"{SCRAPERAPI_URL}?{urlencode(params)}"
+    return requests.get(api_url, timeout=REQUEST_TIMEOUT)
+
+
 def fetch_page(url, retries=3):
     """Fetch a single page, using ScraperAPI if key is configured.
 
     ScraperAPI requires render=true for MercadoLibre (JS-rendered content).
-    Retries on failure to handle occasional timeouts during pagination.
+    Tries with wait_for_selector first; if that fails with a server error,
+    falls back to a request without it.
     """
     for attempt in range(1, retries + 1):
         try:
             if SCRAPERAPI_KEY:
-                params = urlencode({
-                    "api_key": SCRAPERAPI_KEY,
-                    "url": url,
-                    "render": "true",
-                    "country_code": "ar",
-                })
-                api_url = f"{SCRAPERAPI_URL}?{params}"
-                response = requests.get(api_url, timeout=REQUEST_TIMEOUT)
+                try:
+                    response = _scraperapi_request(url, use_wait_for_selector=True)
+                    response.raise_for_status()
+                    return response.text
+                except requests.RequestException as e:
+                    print(f"  wait_for_selector fallo ({e}), reintentando sin el...")
+                    response = _scraperapi_request(url, use_wait_for_selector=False)
+                    response.raise_for_status()
+                    return response.text
             else:
                 response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            return response.text
+                response.raise_for_status()
+                return response.text
         except requests.RequestException:
             if attempt == retries:
                 raise
