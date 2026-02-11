@@ -315,10 +315,21 @@ def fetch_all_listings():
 
     print(f"Total publicaciones (scraping directo): {len(all_listings)}")
 
-    # Fallback to Apify if scraping returned nothing
-    if not all_listings:
-        print("Scraping directo fallo, intentando con Apify...")
-        all_listings = fetch_via_apify()
+    # Supplement with Apify if scraping returned fewer than expected
+    if len(all_listings) < 200:
+        print(f"Pocas publicaciones ({len(all_listings)}), complementando con Apify...")
+        apify_listings = fetch_via_apify()
+
+        # Merge: deduplicate by URL
+        seen_urls = {item["url"] for item in all_listings if item["url"]}
+        new_count = 0
+        for item in apify_listings:
+            if item["url"] and item["url"] not in seen_urls:
+                seen_urls.add(item["url"])
+                all_listings.append(item)
+                new_count += 1
+
+        print(f"Apify agrego {new_count} publicaciones nuevas")
 
     print(f"Total publicaciones finales: {len(all_listings)}")
     return all_listings
