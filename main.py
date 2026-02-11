@@ -20,6 +20,8 @@ from config import (
     HEADERS,
     SCRAPERAPI_KEY,
     SCRAPERAPI_URL,
+    APIFY_API_TOKEN,
+    APIFY_ACTOR_ID,
     SMTP_SERVER,
     SMTP_PORT,
     EMAIL_SENDER,
@@ -157,8 +159,84 @@ def parse_page(html):
     return listings
 
 
+def fetch_via_apify():
+    """Fallback: fetch BAIC listings using the Apify MercadoLibre actor."""
+    if not APIFY_API_TOKEN:
+        print("Apify no configurado, omitiendo fallback")
+        return []
+
+    print("Usando Apify como fallback...")
+    api_base = "https://api.apify.com/v2"
+    headers = {"Authorization": f"Bearer {APIFY_API_TOKEN}"}
+
+    # Run the actor with keyword "Baic"
+    run_input = {
+        "country": "https://listado.mercadolibre.com.ar/",
+        "keyword": "Baic",
+        "pages": 1,
+        "promoted": False,
+    }
+
+    try:
+        # Start actor run and wait for it to finish (up to 120s)
+        resp = requests.post(
+            f"{api_base}/acts/{APIFY_ACTOR_ID}/runs?waitForFinish=120",
+            headers=headers,
+            json=run_input,
+            timeout=150,
+        )
+        resp.raise_for_status()
+        run_data = resp.json()["data"]
+
+        if run_data["status"] != "SUCCEEDED":
+            print(f"  Apify run status: {run_data['status']}")
+            return []
+
+        # Fetch results from the dataset
+        dataset_id = run_data["defaultDatasetId"]
+        resp = requests.get(
+            f"{api_base}/datasets/{dataset_id}/items?format=json",
+            headers=headers,
+            timeout=30,
+        )
+        resp.raise_for_status()
+        items = resp.json()
+
+        print(f"  Apify devolvio {len(items)} publicaciones")
+
+        # Map Apify output to our internal format
+        listings = []
+        for item in items:
+            price_str = item.get("nuevoPrecio", "0") or "0"
+            try:
+                price = int(str(price_str).replace(".", ""))
+            except ValueError:
+                price = 0
+
+            moneda = item.get("Moneda", "ARS $") or "ARS $"
+            currency = "U$S" if "US" in moneda.upper() else "$"
+
+            listings.append({
+                "title": item.get("articuloTitulo", ""),
+                "seller": item.get("Vendedor", "") or "N/A",
+                "price": price,
+                "currency": currency,
+                "location": "",
+                "url": item.get("zdireccion", ""),
+            })
+
+        return listings
+
+    except Exception as e:
+        print(f"  Error en Apify: {e}")
+        return []
+
+
 def fetch_all_listings():
-    """Fetch all BAIC listings across all pages."""
+    """Fetch all BAIC listings across all pages.
+
+    Tries ScraperAPI/direct first. If that returns 0 results, falls back to Apify.
+    """
     all_listings = []
 
     if SCRAPERAPI_KEY:
@@ -181,11 +259,9 @@ def fetch_all_listings():
 
         if not listings:
             if page == 1:
-                # Debug: show what ScraperAPI returned so we can diagnose
                 print(f"  DEBUG: HTML length = {len(html)}")
                 print(f"  DEBUG: Has 'ui-search-layout': {'ui-search-layout' in html}")
                 print(f"  DEBUG: Has 'poly-card': {'poly-card' in html}")
-                print(f"  DEBUG: First 500 chars: {html[:500]}")
             break
 
         all_listings.extend(listings)
@@ -193,7 +269,14 @@ def fetch_all_listings():
         if page < MAX_PAGES:
             time.sleep(REQUEST_DELAY_SECONDS)
 
-    print(f"Total publicaciones obtenidas: {len(all_listings)}")
+    print(f"Total publicaciones (scraping directo): {len(all_listings)}")
+
+    # Fallback to Apify if scraping returned nothing
+    if not all_listings:
+        print("Scraping directo fallo, intentando con Apify...")
+        all_listings = fetch_via_apify()
+
+    print(f"Total publicaciones finales: {len(all_listings)}")
     return all_listings
 
 

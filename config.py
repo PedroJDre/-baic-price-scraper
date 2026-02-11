@@ -20,6 +20,10 @@ HEADERS = {
 SCRAPERAPI_KEY = os.environ.get("SCRAPERAPI_KEY", "")
 SCRAPERAPI_URL = "https://api.scraperapi.com"
 
+# --- Apify (fallback) ---
+APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", "")
+APIFY_ACTOR_ID = "karamelo~mercadolibre-scraper-espanol-castellano"
+
 # --- Email ---
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465
