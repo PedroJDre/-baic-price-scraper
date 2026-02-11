@@ -30,4 +30,4 @@ SMTP_PORT = 465
 EMAIL_SENDER = os.environ.get("EMAIL_SENDER", "")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")  # Gmail App Password
 EMAIL_RECIPIENTS = os.environ.get("EMAIL_RECIPIENTS", "").split(",")
-EMAIL_SUBJECT = "BAIC Precios - Mercado Libre Argentina"
+EMAIL_SUBJECT = "Reporte Diario Mercado Libre"
