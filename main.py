@@ -160,9 +160,16 @@ def parse_page(html):
 
 
 _APIFY_KEYWORDS = [
-    "Baic BJ30", "Baic BJ40", "Baic BJ60",
-    "Baic EU5", "Baic U5",
-    "Baic X25", "Baic X35", "Baic X55",
+    "Baic",
+    "Baic BJ30 2wd",
+    "Baic BJ30 4wd",
+    "Baic BJ40",
+    "Baic BJ60",
+    "Baic EU5",
+    "Baic U5",
+    "Baic X25",
+    "Baic X35",
+    "Baic X55",
 ]
 
 
