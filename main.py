@@ -159,8 +159,40 @@ def parse_page(html):
     return listings
 
 
+_APIFY_KEYWORDS = [
+    "Baic BJ30", "Baic BJ40", "Baic BJ60",
+    "Baic EU5", "Baic U5",
+    "Baic X25", "Baic X35", "Baic X55",
+]
+
+
+def _apify_convert_item(item):
+    """Convert a single Apify result to our internal listing format."""
+    price_str = item.get("nuevoPrecio", "0") or "0"
+    try:
+        price = int(str(price_str).replace(".", ""))
+    except ValueError:
+        price = 0
+
+    moneda = item.get("Moneda", "ARS $") or "ARS $"
+    currency = "U$S" if "US" in moneda.upper() else "$"
+
+    return {
+        "title": item.get("articuloTitulo", ""),
+        "seller": item.get("Vendedor", "") or "N/A",
+        "price": price,
+        "currency": currency,
+        "location": "",
+        "url": item.get("zdireccion", ""),
+    }
+
+
 def fetch_via_apify():
-    """Fallback: fetch BAIC listings using the Apify MercadoLibre actor."""
+    """Fallback: fetch BAIC listings using the Apify MercadoLibre actor.
+
+    Runs one search per BAIC model to maximize coverage on the free plan
+    (which limits each run to 1 page / ~50 results).
+    """
     if not APIFY_API_TOKEN:
         print("Apify no configurado, omitiendo fallback")
         return []
@@ -168,68 +200,73 @@ def fetch_via_apify():
     print("Usando Apify como fallback...")
     api_base = "https://api.apify.com/v2"
     headers = {"Authorization": f"Bearer {APIFY_API_TOKEN}"}
+    all_listings = []
+    seen_urls = set()
 
-    # Run the actor with keyword "Baic"
-    run_input = {
-        "country": "https://listado.mercadolibre.com.ar/",
-        "keyword": "Baic",
-        "pages": 1,
-        "promoted": False,
-    }
+    for keyword in _APIFY_KEYWORDS:
+        print(f"  Apify buscando: '{keyword}'")
+        run_input = {
+            "country": "https://listado.mercadolibre.com.ar/",
+            "keyword": keyword,
+            "pages": 1,
+            "promoted": False,
+        }
 
-    try:
-        # Start actor run and wait for it to finish (up to 120s)
-        resp = requests.post(
-            f"{api_base}/acts/{APIFY_ACTOR_ID}/runs?waitForFinish=120",
-            headers=headers,
-            json=run_input,
-            timeout=150,
-        )
-        resp.raise_for_status()
-        run_data = resp.json()["data"]
+        try:
+            resp = requests.post(
+                f"{api_base}/acts/{APIFY_ACTOR_ID}/runs?waitForFinish=120",
+                headers=headers,
+                json=run_input,
+                timeout=150,
+            )
+            resp.raise_for_status()
+            run_data = resp.json()["data"]
 
-        if run_data["status"] != "SUCCEEDED":
-            print(f"  Apify run status: {run_data['status']}")
-            return []
+            # Poll if still running
+            if run_data["status"] not in ("SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"):
+                run_id = run_data["id"]
+                for _ in range(6):
+                    time.sleep(10)
+                    poll = requests.get(
+                        f"{api_base}/actor-runs/{run_id}",
+                        headers=headers,
+                        timeout=30,
+                    )
+                    poll.raise_for_status()
+                    run_data = poll.json()["data"]
+                    if run_data["status"] in ("SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"):
+                        break
 
-        # Fetch results from the dataset
-        dataset_id = run_data["defaultDatasetId"]
-        resp = requests.get(
-            f"{api_base}/datasets/{dataset_id}/items?format=json",
-            headers=headers,
-            timeout=30,
-        )
-        resp.raise_for_status()
-        items = resp.json()
+            if run_data["status"] != "SUCCEEDED":
+                print(f"    Status: {run_data['status']}, omitiendo")
+                continue
 
-        print(f"  Apify devolvio {len(items)} publicaciones")
+            dataset_id = run_data["defaultDatasetId"]
+            resp = requests.get(
+                f"{api_base}/datasets/{dataset_id}/items?format=json",
+                headers=headers,
+                timeout=30,
+            )
+            resp.raise_for_status()
+            items = resp.json()
 
-        # Map Apify output to our internal format
-        listings = []
-        for item in items:
-            price_str = item.get("nuevoPrecio", "0") or "0"
-            try:
-                price = int(str(price_str).replace(".", ""))
-            except ValueError:
-                price = 0
+            # Deduplicate by URL
+            new_count = 0
+            for item in items:
+                url = item.get("zdireccion", "")
+                if url and url not in seen_urls:
+                    seen_urls.add(url)
+                    all_listings.append(_apify_convert_item(item))
+                    new_count += 1
 
-            moneda = item.get("Moneda", "ARS $") or "ARS $"
-            currency = "U$S" if "US" in moneda.upper() else "$"
+            print(f"    {len(items)} resultados, {new_count} nuevos")
 
-            listings.append({
-                "title": item.get("articuloTitulo", ""),
-                "seller": item.get("Vendedor", "") or "N/A",
-                "price": price,
-                "currency": currency,
-                "location": "",
-                "url": item.get("zdireccion", ""),
-            })
+        except Exception as e:
+            print(f"    Error para '{keyword}': {e}")
+            continue
 
-        return listings
-
-    except Exception as e:
-        print(f"  Error en Apify: {e}")
-        return []
+    print(f"  Apify total: {len(all_listings)} publicaciones unicas")
+    return all_listings
 
 
 def fetch_all_listings():
