@@ -1,3 +1,5 @@
+import json
+import os
 import re
 import sys
 import time
@@ -29,6 +31,57 @@ from config import (
     EMAIL_RECIPIENTS,
     EMAIL_SUBJECT,
 )
+
+PRICES_FILE = os.path.join(os.path.dirname(__file__), "data", "prices.json")
+
+
+def load_previous_prices():
+    """Load previous run's prices from data/prices.json.
+
+    Returns {url: {"price": int, "currency": str}} or empty dict if file missing.
+    """
+    try:
+        with open(PRICES_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def save_current_prices(items):
+    """Save current listings' prices to data/prices.json."""
+    prices = {}
+    for item in items:
+        prices[item["url"]] = {
+            "price": item["price"],
+            "currency": item["currency"],
+        }
+    os.makedirs(os.path.dirname(PRICES_FILE), exist_ok=True)
+    with open(PRICES_FILE, "w", encoding="utf-8") as f:
+        json.dump(prices, f, ensure_ascii=False, indent=2)
+    print(f"Precios guardados en {PRICES_FILE} ({len(prices)} publicaciones)")
+
+
+def compute_price_changes(items, previous):
+    """Compare current prices to previous run and tag each item.
+
+    Sets item["price_change"] to "up", "down", "same", or "new".
+    Sets item["price_diff"] to the absolute difference (0 for new/same).
+    """
+    for item in items:
+        url = item["url"]
+        prev = previous.get(url)
+        if prev is None or prev.get("currency") != item["currency"]:
+            item["price_change"] = "new"
+            item["price_diff"] = 0
+        elif item["price"] > prev["price"]:
+            item["price_change"] = "up"
+            item["price_diff"] = item["price"] - prev["price"]
+        elif item["price"] < prev["price"]:
+            item["price_change"] = "down"
+            item["price_diff"] = prev["price"] - item["price"]
+        else:
+            item["price_change"] = "same"
+            item["price_diff"] = 0
 
 
 def build_page_url(page_number):
@@ -399,8 +452,13 @@ def _merge_similar_groups(grouped, cutoff=0.7):
 
 
 def _strip_model_prefix(title, model):
-    """Remove 'Baic MODEL' prefix from title to get just the variant info."""
-    cleaned = re.sub(rf'^Baic\s+{re.escape(model)}\s*', '', title, flags=re.IGNORECASE).strip()
+    """Remove 'Baic MODEL' prefix and redundant model name from title."""
+    # Strip "Baic MODEL" or "Baic MODELe" prefix (e.g. Bj30e)
+    cleaned = re.sub(rf'^Baic\s+{re.escape(model)}e?\s*', '', title, flags=re.IGNORECASE).strip()
+    # Remove any remaining occurrences of the model name (e.g. "1.5t Bj30 4wd")
+    cleaned = re.sub(rf'\b{re.escape(model)}e?\b', '', cleaned, flags=re.IGNORECASE).strip()
+    # Collapse multiple spaces left by removals
+    cleaned = re.sub(r'\s{2,}', ' ', cleaned).strip()
     return cleaned or title
 
 
@@ -413,8 +471,8 @@ _SUBCAT_PATTERNS = [
     (r'\bHonor\b', 'Honor'),
     (r'\bFashion\b', 'Fashion'),
     (r'\b(?:Comfort|Confort)\b', 'Comfort'),
-    (r'\b4[wx][d4]\b', '4WD'),
-    (r'\b2[wW][dD]\b', '2WD'),
+    (r'\b4[wx][d4]\b', '4x4'),
+    (r'\b(?:2wd|4x2)\b', '4x2'),
     (r'\b(?:Electric[oa]?|100%\s*Electrico)\b', 'Electrico'),
     (r'\b(?:Mhev|Milhybrid|Hybrid|H[ií]brida?)\b', 'Hybrid'),
 ]
@@ -472,8 +530,17 @@ def format_plain_text(grouped):
         lines.append("-" * 40)
         for entry in entries:
             price_str = _format_price(entry)
+            change = entry.get("price_change", "new")
+            diff = entry.get("price_diff", 0)
+            change_str = ""
+            if change == "up":
+                diff_fmt = f"{diff:,}".replace(",", ".")
+                change_str = f" (\u2191 +{diff_fmt})"
+            elif change == "down":
+                diff_fmt = f"{diff:,}".replace(",", ".")
+                change_str = f" (\u2193 -{diff_fmt})"
             loc = f"  ({entry['location']})" if entry["location"] else ""
-            lines.append(f"  {entry['title']} | {entry['seller']}: {price_str}{loc}")
+            lines.append(f"  {entry['title']} | {entry['seller']}: {price_str}{change_str}{loc}")
             total_listings += 1
         lines.append("")
 
@@ -553,12 +620,39 @@ def format_html_email(grouped):
                 seller = entry["seller"] if entry["seller"] != "N/A" else '<span style="color:#999;">\u2014</span>'
                 location = entry["location"] if entry["location"] else '<span style="color:#999;">\u2014</span>'
 
+                # Price change indicator
+                change = entry.get("price_change", "new")
+                diff = entry.get("price_diff", 0)
+                change_html = ""
+                if change == "up":
+                    diff_fmt = f"{diff:,}".replace(",", ".")
+                    change_html = (
+                        f'<br><span style="color:#c62828;font-size:11px;font-weight:600;">'
+                        f'\u2191 +{diff_fmt}</span>'
+                    )
+                elif change == "down":
+                    diff_fmt = f"{diff:,}".replace(",", ".")
+                    change_html = (
+                        f'<br><span style="color:#2e7d32;font-size:11px;font-weight:600;">'
+                        f'\u2193 -{diff_fmt}</span>'
+                    )
+
+                # NUEVA badge for new listings
+                nueva_badge = ""
+                if change == "new":
+                    nueva_badge = (
+                        ' <span style="display:inline-block;background-color:#ff6f00;color:#fff;'
+                        'font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;'
+                        'vertical-align:middle;margin-left:4px;">NUEVA</span>'
+                    )
+
                 rows.append(
                     f'<tr style="background-color:{bg};">'
-                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;">{variant}</td>'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;">'
+                    f'{variant}{nueva_badge}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#444;">{seller}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:right;'
-                    f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}</td>'
+                    f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}{change_html}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#555;">{location}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:center;">'
                     f'<a href="{entry["url"]}" target="_blank" style="display:inline-block;'
@@ -616,6 +710,38 @@ def format_html_email(grouped):
 
     sections_html = "\n".join(sections)
 
+    # --- price changes summary ---
+    all_entries = [e for entries in grouped.values() for e in entries]
+    n_up = sum(1 for e in all_entries if e.get("price_change") == "up")
+    n_down = sum(1 for e in all_entries if e.get("price_change") == "down")
+    n_new = sum(1 for e in all_entries if e.get("price_change") == "new")
+    n_same = sum(1 for e in all_entries if e.get("price_change") == "same")
+
+    changes_summary = ""
+    if n_up or n_down or n_new:
+        parts = []
+        if n_up:
+            parts.append(
+                f'<span style="color:#c62828;font-weight:600;">\u2191 {n_up} subieron</span>'
+            )
+        if n_down:
+            parts.append(
+                f'<span style="color:#2e7d32;font-weight:600;">\u2193 {n_down} bajaron</span>'
+            )
+        if n_same:
+            parts.append(f'<span style="color:#555;">= {n_same} sin cambio</span>')
+        if n_new:
+            parts.append(
+                f'<span style="color:#ff6f00;font-weight:600;">{n_new} nuevas</span>'
+            )
+        changes_summary = (
+            '<tr><td style="padding:0 30px 16px;text-align:center;">'
+            '<div style="background-color:#f5f6fa;border-radius:8px;padding:10px 16px;'
+            'font-size:13px;">'
+            f'{" &bull; ".join(parts)}'
+            '</div></td></tr>'
+        )
+
     return (
         '<!DOCTYPE html>'
         '<html lang="es"><head><meta charset="utf-8">'
@@ -647,6 +773,8 @@ def format_html_email(grouped):
         f'padding:6px 20px;border-radius:20px;font-size:13px;font-weight:600;">'
         f'{total_listings} publicaciones en {len(grouped)} modelos</span>'
         '</td></tr>'
+        # PRICE CHANGES SUMMARY
+        f'{changes_summary}'
         # SECTIONS
         f'<tr><td style="padding:0 24px 24px;">{sections_html}</td></tr>'
         # FOOTER
@@ -696,6 +824,16 @@ def main():
         print(f"ERROR al obtener publicaciones: {e}")
         sys.exit(1)
 
+    # Price change tracking
+    previous_prices = load_previous_prices()
+    compute_price_changes(items, previous_prices)
+
+    n_up = sum(1 for i in items if i.get("price_change") == "up")
+    n_down = sum(1 for i in items if i.get("price_change") == "down")
+    n_new = sum(1 for i in items if i.get("price_change") == "new")
+    n_same = sum(1 for i in items if i.get("price_change") == "same")
+    print(f"Cambios de precio: {n_up} subieron, {n_down} bajaron, {n_same} sin cambio, {n_new} nuevas")
+
     grouped = process_listings(items)
     plain_body = format_plain_text(grouped)
     html_body = format_html_email(grouped)
@@ -710,6 +848,7 @@ def main():
         print(f"ERROR al enviar email: {e}")
         sys.exit(1)
 
+    save_current_prices(items)
     print("Listo.")
 
 
