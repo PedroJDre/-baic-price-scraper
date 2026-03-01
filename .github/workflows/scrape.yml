@@ -2,9 +2,12 @@ name: BAIC Price Scraper
 
 on:
   schedule:
-    # Monday, Wednesday, Friday at 12:00 UTC (9:00 AM Argentina time, GMT-3)
-    - cron: '0 12 * * 1,3,5'
+    # Monday and Thursday at 12:00 UTC (9:00 AM Argentina time, GMT-3)
+    - cron: '0 12 * * 1,4'
   workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
 
 jobs:
   scrape:
@@ -30,3 +33,11 @@ jobs:
           SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
           APIFY_API_TOKEN: ${{ secrets.APIFY_API_TOKEN }}
         run: python main.py
+
+      - name: Save price history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/prices.json
+          git diff --staged --quiet || git commit -m "Update price history [skip ci]"
+          git push
