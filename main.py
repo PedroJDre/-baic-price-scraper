@@ -170,17 +170,39 @@ def parse_page(html):
         )
         title = re.sub(r"<[^>]+>", "", title_match.group(1)).strip() if title_match else ""
 
-        # Extract price (fraction part)
-        price_match = re.search(
+        # Extract all prices from the card
+        price_strs = re.findall(
             r'class="andes-money-amount__fraction"[^>]*>([^<]+)', card
         )
-        price_str = price_match.group(1).strip() if price_match else "0"
 
         # Extract currency symbol
         currency_match = re.search(
             r'class="andes-money-amount__currency-symbol"[^>]*>([^<]+)', card
         )
         currency = currency_match.group(1).strip() if currency_match else "$"
+
+        # Detect anticipo: check if card contains "anticipo" text
+        has_anticipo = bool(re.search(r'anticipo', card, re.IGNORECASE))
+
+        # Parse all prices to integers
+        parsed_prices = []
+        for ps in price_strs:
+            try:
+                parsed_prices.append(int(ps.strip().replace(".", "")))
+            except ValueError:
+                pass
+
+        if has_anticipo and len(parsed_prices) >= 2:
+            # When anticipo is present, the larger value is the full price
+            # and the smaller value is the anticipo (down payment)
+            price = max(parsed_prices)
+            anticipo = min(parsed_prices)
+        elif parsed_prices:
+            price = parsed_prices[0]
+            anticipo = 0
+        else:
+            price = 0
+            anticipo = 0
 
         # Extract seller name
         seller_match = re.search(
@@ -194,16 +216,11 @@ def parse_page(html):
         )
         location = location_match.group(1).strip() if location_match else ""
 
-        # Parse price to integer (format: "28.500.000" -> 28500000)
-        try:
-            price = int(price_str.replace(".", ""))
-        except ValueError:
-            price = 0
-
         listings.append({
             "title": title,
             "seller": seller,
             "price": price,
+            "anticipo": anticipo,
             "currency": currency,
             "location": location,
             "url": item_url,
@@ -241,6 +258,7 @@ def _apify_convert_item(item):
         "title": item.get("articuloTitulo", ""),
         "seller": item.get("Vendedor", "") or "N/A",
         "price": price,
+        "anticipo": 0,
         "currency": currency,
         "location": "",
         "url": item.get("zdireccion", ""),
@@ -539,8 +557,12 @@ def format_plain_text(grouped):
             elif change == "down":
                 diff_fmt = f"{diff:,}".replace(",", ".")
                 change_str = f" (\u2193 -{diff_fmt})"
+            anticipo_str = ""
+            if entry.get("anticipo"):
+                ant_fmt = f"{entry['anticipo']:,}".replace(",", ".")
+                anticipo_str = f" (Anticipo: ${ant_fmt})"
             loc = f"  ({entry['location']})" if entry["location"] else ""
-            lines.append(f"  {entry['title']} | {entry['seller']}: {price_str}{change_str}{loc}")
+            lines.append(f"  {entry['title']} | {entry['seller']}: {price_str}{change_str}{anticipo_str}{loc}")
             total_listings += 1
         lines.append("")
 
@@ -637,6 +659,15 @@ def format_html_email(grouped):
                         f'\u2193 -{diff_fmt}</span>'
                     )
 
+                # Anticipo indicator
+                anticipo_html = ""
+                if entry.get("anticipo"):
+                    ant_fmt = f"{entry['anticipo']:,}".replace(",", ".")
+                    anticipo_html = (
+                        f'<br><span style="color:#e65100;font-size:11px;font-weight:600;">'
+                        f'Anticipo: ${ant_fmt}</span>'
+                    )
+
                 # NUEVA badge for new listings
                 nueva_badge = ""
                 if change == "new":
@@ -652,7 +683,7 @@ def format_html_email(grouped):
                     f'{variant}{nueva_badge}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#444;">{seller}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:right;'
-                    f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}{change_html}</td>'
+                    f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}{change_html}{anticipo_html}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#555;">{location}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:center;">'
                     f'<a href="{entry["url"]}" target="_blank" style="display:inline-block;'
