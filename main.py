@@ -11,6 +11,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from urllib.parse import urlencode
 
+import anthropic
 import requests
 
 from config import (
@@ -30,6 +31,10 @@ from config import (
     EMAIL_PASSWORD,
     EMAIL_RECIPIENTS,
     EMAIL_SUBJECT,
+    ANTHROPIC_API_KEY,
+    ANTHROPIC_MODEL,
+    HISTORY_FILE,
+    HISTORY_MAX_ENTRIES,
 )
 
 
@@ -523,11 +528,12 @@ def _price_range_str(entries):
     return f"{_format_price(lo)} \u2014 {_format_price(hi)}"
 
 
-def format_plain_text(results_by_brand):
+def format_plain_text(results_by_brand, summaries_by_brand=None):
     """Format grouped listings into a plain-text body for console output."""
     if not results_by_brand or not any(results_by_brand.values()):
         return "No se encontraron publicaciones en Mercado Libre."
 
+    summaries_by_brand = summaries_by_brand or {}
     lines = []
     lines.append("=" * 60)
     lines.append("Reporte de Precios - Mercado Libre Argentina")
@@ -545,6 +551,10 @@ def format_plain_text(results_by_brand):
         lines.append(f"{'#' * 60}")
         lines.append(f"  {brand_name.upper()}")
         lines.append(f"{'#' * 60}")
+
+        summary = summaries_by_brand.get(brand_name, "")
+        if summary:
+            lines.append(f"\nRESUMEN EJECUTIVO:\n{summary}\n")
 
         for model, entries in grouped.items():
             lines.append(f"\nModelo: {model} ({len(entries)} publicaciones)")
@@ -579,7 +589,7 @@ def format_plain_text(results_by_brand):
     return "\n".join(lines)
 
 
-def _build_brand_html_section(brand_name, grouped, brand_config):
+def _build_brand_html_section(brand_name, grouped, brand_config, summary=""):
     """Build the HTML block for one brand (summary cards + model detail tables)."""
     if not grouped:
         return (
@@ -743,6 +753,16 @@ def _build_brand_html_section(brand_name, grouped, brand_config):
         if price_range else ''
     )
 
+    summary_html = ""
+    if summary:
+        summary_html = (
+            f'<div style="background-color:#fffde7;border-left:4px solid {header_color};'
+            f'padding:14px 18px;margin-bottom:20px;border-radius:0 6px 6px 0;'
+            f'font-size:13px;line-height:1.7;color:#333;font-style:italic;">'
+            f'{summary}'
+            f'</div>'
+        )
+
     return (
         # Brand header bar
         f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">'
@@ -753,8 +773,10 @@ def _build_brand_html_section(brand_name, grouped, brand_config):
         f'{total} publicaciones &bull; {len(grouped)} modelos</span>'
         f'{range_badge_total}'
         f'</td></tr></table>'
+        # Executive summary
+        + summary_html
         # Summary cards
-        f'<table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">'
+        + f'<table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">'
         f'<tr>{summary_cards_html}</tr>'
         f'</table>'
         # Model sections
@@ -762,8 +784,9 @@ def _build_brand_html_section(brand_name, grouped, brand_config):
     )
 
 
-def format_html_email(results_by_brand):
+def format_html_email(results_by_brand, summaries_by_brand=None):
     """Format all brands into a single styled HTML email (dashboard layout)."""
+    summaries_by_brand = summaries_by_brand or {}
     if not results_by_brand or not any(results_by_brand.values()):
         return (
             "<!DOCTYPE html><html><body>"
@@ -809,7 +832,10 @@ def format_html_email(results_by_brand):
     for brand_name, grouped in results_by_brand.items():
         brand_config = BRANDS.get(brand_name, {})
         brand_sections.append(
-            _build_brand_html_section(brand_name, grouped, brand_config)
+            _build_brand_html_section(
+                brand_name, grouped, brand_config,
+                summary=summaries_by_brand.get(brand_name, ""),
+            )
         )
     # Separate brands with a horizontal divider
     brands_html = '<hr style="border:none;border-top:2px solid #e0e3eb;margin:32px 0;">'.join(
@@ -853,6 +879,128 @@ def format_html_email(results_by_brand):
     )
 
 
+def load_history():
+    """Load the accumulated run history from data/history.json."""
+    full_path = os.path.join(os.path.dirname(__file__), HISTORY_FILE)
+    try:
+        with open(full_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def save_history(history):
+    """Persist history, keeping only the most recent HISTORY_MAX_ENTRIES entries."""
+    full_path = os.path.join(os.path.dirname(__file__), HISTORY_FILE)
+    # Keep most recent entries only
+    if len(history) > HISTORY_MAX_ENTRIES:
+        keys = sorted(history.keys())[-HISTORY_MAX_ENTRIES:]
+        history = {k: history[k] for k in keys}
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+    with open(full_path, "w", encoding="utf-8") as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
+    print(f"Historial guardado en {full_path} ({len(history)} entradas)")
+
+
+def _compute_brand_stats(brand_name, grouped, items):
+    """Compute per-model and total stats for one brand run."""
+    models = {}
+    for model, entries in grouped.items():
+        prices = [e["price"] for e in entries if e.get("price", 0) > 0]
+        if not prices:
+            continue
+        models[model] = {
+            "avg": round(sum(prices) / len(prices)),
+            "min": min(prices),
+            "max": max(prices),
+            "count": len(entries),
+            "n_up": sum(1 for e in entries if e.get("price_change") == "up"),
+            "n_down": sum(1 for e in entries if e.get("price_change") == "down"),
+            "n_new": sum(1 for e in entries if e.get("price_change") == "new"),
+        }
+    return {"total": len(items), "models": models}
+
+
+def update_history(history, date_str, brand_name, stats):
+    """Add today's stats for a brand into the history dict."""
+    if date_str not in history:
+        history[date_str] = {}
+    history[date_str][brand_name] = stats
+    return history
+
+
+def generate_brand_summary(brand_name, grouped, items, history):
+    """Call Claude Haiku to generate a one-paragraph executive summary for a brand.
+
+    Falls back to a plain-text summary if the API key is not set or the call fails.
+    """
+    if not ANTHROPIC_API_KEY:
+        return ""
+
+    # Current stats
+    stats = _compute_brand_stats(brand_name, grouped, items)
+
+    # Format current data for the prompt
+    def fmt_price(p):
+        return f"${p:,.0f}".replace(",", ".")
+
+    model_lines = []
+    for model, s in stats["models"].items():
+        model_lines.append(
+            f"  - {model}: {s['count']} pub., "
+            f"promedio {fmt_price(s['avg'])}, "
+            f"rango {fmt_price(s['min'])}–{fmt_price(s['max'])}, "
+            f"{s['n_up']} subieron / {s['n_down']} bajaron / {s['n_new']} nuevas"
+        )
+    current_block = f"Total: {stats['total']} publicaciones\n" + "\n".join(model_lines)
+
+    # Format recent history (last 4 runs, excluding today)
+    today = datetime.now().strftime("%Y-%m-%d")
+    past_runs = sorted(
+        [(d, v[brand_name]) for d, v in history.items()
+         if d != today and brand_name in v],
+        key=lambda x: x[0],
+    )[-4:]
+
+    history_block = ""
+    if past_runs:
+        history_lines = []
+        for date, h_stats in past_runs:
+            h_models = []
+            for model, s in h_stats.get("models", {}).items():
+                h_models.append(f"{model}: promedio {fmt_price(s['avg'])} ({s['count']} pub.)")
+            history_lines.append(f"  {date}: " + ", ".join(h_models))
+        history_block = "\nHISTORIAL RECIENTE (últimas corridas):\n" + "\n".join(history_lines)
+    else:
+        history_block = "\n(Primera corrida — sin historial previo)"
+
+    prompt = (
+        f"Sos un analista de mercado automotor argentino. "
+        f"Con base en los siguientes datos del mercado de autos {brand_name} "
+        f"en Mercado Libre Argentina, escribí UN párrafo ejecutivo conciso "
+        f"(3-5 oraciones) en español. "
+        f"Incluí: volumen de publicaciones, tendencia de precios respecto al historial, "
+        f"modelos más activos o con mayor variación, y cualquier dato llamativo. "
+        f"No uses bullet points ni título. Solo el párrafo.\n\n"
+        f"DATOS ACTUALES ({today}):\n{current_block}"
+        f"{history_block}"
+    )
+
+    try:
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        message = client.messages.create(
+            model=ANTHROPIC_MODEL,
+            max_tokens=350,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        summary = message.content[0].text.strip()
+        print(f"[{brand_name}] Resumen ejecutivo generado ({len(summary.split())} palabras)")
+        return summary
+    except Exception as e:
+        print(f"[{brand_name}] Error al generar resumen con Claude: {e}")
+        return ""
+
+
 def send_email(subject, plain_body, html_body):
     """Send the email via Gmail SMTP with HTML + plain text fallback."""
     if not EMAIL_SENDER or not EMAIL_PASSWORD:
@@ -882,6 +1030,8 @@ def send_email(subject, plain_body, html_body):
 def main():
     print(f"Iniciando scraper - {datetime.now()}")
 
+    history = load_history()
+    today = datetime.now().strftime("%Y-%m-%d")
     all_results = {}  # brand_name -> {"grouped": ..., "items": ..., "prices_file": ...}
 
     for brand_name, brand_config in BRANDS.items():
@@ -913,15 +1063,28 @@ def main():
         )
 
         grouped = process_listings(items, brand_config["known_models"], brand_name)
+
+        # Accumulate stats into history
+        stats = _compute_brand_stats(brand_name, grouped, items)
+        update_history(history, today, brand_name, stats)
+
         all_results[brand_name] = {
             "grouped": grouped,
             "items": items,
             "prices_file": brand_config["prices_file"],
         }
 
+    # Generate executive summaries via Claude Haiku
+    print("\nGenerando resumenes ejecutivos...")
+    summaries_by_brand = {}
+    for brand_name, data in all_results.items():
+        summaries_by_brand[brand_name] = generate_brand_summary(
+            brand_name, data["grouped"], data["items"], history
+        )
+
     results_by_brand = {brand: data["grouped"] for brand, data in all_results.items()}
-    plain_body = format_plain_text(results_by_brand)
-    html_body = format_html_email(results_by_brand)
+    plain_body = format_plain_text(results_by_brand, summaries_by_brand)
+    html_body = format_html_email(results_by_brand, summaries_by_brand)
 
     print("\n--- CONTENIDO DEL EMAIL ---")
     print(plain_body)
@@ -936,6 +1099,7 @@ def main():
     for brand_name, data in all_results.items():
         save_current_prices(data["items"], data["prices_file"])
 
+    save_history(history)
     print("Listo.")
 
 

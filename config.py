@@ -15,6 +15,12 @@ HEADERS = {
     "Accept-Language": "es-AR,es;q=0.9",
 }
 
+# --- Claude API (executive summary) ---
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL = "claude-3-5-haiku-20241022"
+HISTORY_FILE = "data/history.json"
+HISTORY_MAX_ENTRIES = 12  # ~6 weeks of data
+
 # --- ScraperAPI ---
 SCRAPERAPI_KEY = os.environ.get("SCRAPERAPI_KEY", "")
 SCRAPERAPI_URL = "https://api.scraperapi.com"
