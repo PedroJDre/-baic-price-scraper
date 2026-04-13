@@ -1,7 +1,6 @@
 import os
 
-# --- HTML Scraping ---
-BASE_URL = "https://autos.mercadolibre.com.ar/baic/"
+# --- Scraping settings ---
 ITEMS_PER_PAGE = 48
 MAX_PAGES = 20  # Safety cap: 20 pages * 48 = 960 listings max
 REQUEST_DELAY_SECONDS = 2.0
@@ -31,3 +30,48 @@ EMAIL_SENDER = os.environ.get("EMAIL_SENDER", "")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")  # Gmail App Password
 EMAIL_RECIPIENTS = os.environ.get("EMAIL_RECIPIENTS", "").split(",")
 EMAIL_SUBJECT = "Reporte Diario Mercado Libre"
+
+# --- Brands to scrape ---
+BRANDS = {
+    "BAIC": {
+        "base_url": "https://autos.mercadolibre.com.ar/baic/",
+        "known_models": ["BJ30", "BJ40", "BJ60", "EU5", "U5", "X25", "X35", "X55"],
+        "apify_keywords": [
+            "Baic",
+            "Baic BJ30 2wd",
+            "Baic BJ30 4wd",
+            "Baic BJ40",
+            "Baic BJ60",
+            "Baic EU5",
+            "Baic U5",
+            "Baic X25",
+            "Baic X35",
+            "Baic X55",
+        ],
+        "prices_file": "data/prices_baic.json",
+        "min_listings_threshold": 200,
+        "header_color": "#0d47a1",
+        "card_color": "#1a237e",
+    },
+    "Chery": {
+        "base_url": "https://autos.mercadolibre.com.ar/chery/",
+        "known_models": [
+            "Tiggo 2", "Tiggo 3", "Tiggo 4", "Tiggo 7", "Tiggo 8",
+            "Arrizo 6", "Arrizo 8",
+        ],
+        "apify_keywords": [
+            "Chery Tiggo 4",
+            "Chery Tiggo 4 Pro",
+            "Chery Tiggo 7",
+            "Chery Tiggo 7 Pro",
+            "Chery Tiggo 8",
+            "Chery Tiggo 8 Pro",
+            "Chery Arrizo 6",
+            "Chery Arrizo 8",
+        ],
+        "prices_file": "data/prices_chery.json",
+        "min_listings_threshold": 100,
+        "header_color": "#b71c1c",
+        "card_color": "#7f0000",
+    },
+}

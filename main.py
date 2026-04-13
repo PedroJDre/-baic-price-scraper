@@ -14,7 +14,7 @@ from urllib.parse import urlencode
 import requests
 
 from config import (
-    BASE_URL,
+    BRANDS,
     ITEMS_PER_PAGE,
     MAX_PAGES,
     REQUEST_DELAY_SECONDS,
@@ -32,33 +32,33 @@ from config import (
     EMAIL_SUBJECT,
 )
 
-PRICES_FILE = os.path.join(os.path.dirname(__file__), "data", "prices.json")
 
-
-def load_previous_prices():
-    """Load previous run's prices from data/prices.json.
+def load_previous_prices(prices_file):
+    """Load previous run's prices from the given file.
 
     Returns {url: {"price": int, "currency": str}} or empty dict if file missing.
     """
+    full_path = os.path.join(os.path.dirname(__file__), prices_file)
     try:
-        with open(PRICES_FILE, "r", encoding="utf-8") as f:
+        with open(full_path, "r", encoding="utf-8") as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
 
-def save_current_prices(items):
-    """Save current listings' prices to data/prices.json."""
+def save_current_prices(items, prices_file):
+    """Save current listings' prices to the given file."""
+    full_path = os.path.join(os.path.dirname(__file__), prices_file)
     prices = {}
     for item in items:
         prices[item["url"]] = {
             "price": item["price"],
             "currency": item["currency"],
         }
-    os.makedirs(os.path.dirname(PRICES_FILE), exist_ok=True)
-    with open(PRICES_FILE, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+    with open(full_path, "w", encoding="utf-8") as f:
         json.dump(prices, f, ensure_ascii=False, indent=2)
-    print(f"Precios guardados en {PRICES_FILE} ({len(prices)} publicaciones)")
+    print(f"Precios guardados en {full_path} ({len(prices)} publicaciones)")
 
 
 def compute_price_changes(items, previous):
@@ -84,12 +84,12 @@ def compute_price_changes(items, previous):
             item["price_diff"] = 0
 
 
-def build_page_url(page_number):
+def build_page_url(page_number, base_url):
     """Build the URL for a given page number (1-based)."""
     if page_number <= 1:
-        return BASE_URL
+        return base_url
     offset = (page_number - 1) * ITEMS_PER_PAGE + 1
-    return f"{BASE_URL}_Desde_{offset}"
+    return f"{base_url}_Desde_{offset}"
 
 
 def _scraperapi_request(url, use_wait_for_selector=True):
@@ -229,20 +229,6 @@ def parse_page(html):
     return listings
 
 
-_APIFY_KEYWORDS = [
-    "Baic",
-    "Baic BJ30 2wd",
-    "Baic BJ30 4wd",
-    "Baic BJ40",
-    "Baic BJ60",
-    "Baic EU5",
-    "Baic U5",
-    "Baic X25",
-    "Baic X35",
-    "Baic X55",
-]
-
-
 def _apify_convert_item(item):
     """Convert a single Apify result to our internal listing format."""
     price_str = item.get("nuevoPrecio", "0") or "0"
@@ -265,10 +251,10 @@ def _apify_convert_item(item):
     }
 
 
-def fetch_via_apify():
-    """Fallback: fetch BAIC listings using the Apify MercadoLibre actor.
+def fetch_via_apify(apify_keywords):
+    """Fallback: fetch listings using the Apify MercadoLibre actor.
 
-    Runs one search per BAIC model to maximize coverage on the free plan
+    Runs one search per keyword to maximize coverage on the free plan
     (which limits each run to 1 page / ~50 results).
     """
     if not APIFY_API_TOKEN:
@@ -281,7 +267,7 @@ def fetch_via_apify():
     all_listings = []
     seen_urls = set()
 
-    for keyword in _APIFY_KEYWORDS:
+    for keyword in apify_keywords:
         print(f"  Apify buscando: '{keyword}'")
         run_input = {
             "country": "https://listado.mercadolibre.com.ar/",
@@ -347,21 +333,21 @@ def fetch_via_apify():
     return all_listings
 
 
-def fetch_all_listings():
-    """Fetch all BAIC listings across all pages.
+def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_threshold=200):
+    """Fetch all listings for a brand across all pages.
 
-    Tries ScraperAPI/direct first. If that returns 0 results, falls back to Apify.
+    Tries ScraperAPI/direct first. If that returns too few results, falls back to Apify.
     """
     all_listings = []
 
     if SCRAPERAPI_KEY:
-        print("Usando ScraperAPI para las solicitudes")
+        print(f"[{brand_name}] Usando ScraperAPI para las solicitudes")
     else:
-        print("ScraperAPI no configurado, usando solicitudes directas")
+        print(f"[{brand_name}] ScraperAPI no configurado, usando solicitudes directas")
 
     for page in range(1, MAX_PAGES + 1):
-        url = build_page_url(page)
-        print(f"Pagina {page}: {url}")
+        url = build_page_url(page, base_url)
+        print(f"[{brand_name}] Pagina {page}: {url}")
 
         try:
             html = fetch_page(url)
@@ -384,12 +370,12 @@ def fetch_all_listings():
         if page < MAX_PAGES:
             time.sleep(REQUEST_DELAY_SECONDS)
 
-    print(f"Total publicaciones (scraping directo): {len(all_listings)}")
+    print(f"[{brand_name}] Total publicaciones (scraping directo): {len(all_listings)}")
 
     # Supplement with Apify if scraping returned fewer than expected
-    if len(all_listings) < 200:
-        print(f"Pocas publicaciones ({len(all_listings)}), complementando con Apify...")
-        apify_listings = fetch_via_apify()
+    if len(all_listings) < min_listings_threshold:
+        print(f"[{brand_name}] Pocas publicaciones ({len(all_listings)}), complementando con Apify...")
+        apify_listings = fetch_via_apify(apify_keywords)
 
         # Merge: deduplicate by URL
         seen_urls = {item["url"] for item in all_listings if item["url"]}
@@ -400,19 +386,14 @@ def fetch_all_listings():
                 all_listings.append(item)
                 new_count += 1
 
-        print(f"Apify agrego {new_count} publicaciones nuevas")
+        print(f"[{brand_name}] Apify agrego {new_count} publicaciones nuevas")
 
-    print(f"Total publicaciones finales: {len(all_listings)}")
+    print(f"[{brand_name}] Total publicaciones finales: {len(all_listings)}")
     return all_listings
 
 
-KNOWN_MODELS = ["BJ30", "BJ40", "BJ60", "EU5", "U5", "X25", "X35", "X55"]
-# Sorted longest-first so EU5 is checked before U5, etc.
-_MODELS_BY_LEN = sorted(KNOWN_MODELS, key=len, reverse=True)
-
-
-def extract_base_model(title):
-    """Extract the base model name (e.g. BJ30, X35, EU5) from a listing title.
+def extract_base_model(title, known_models, brand_name):
+    """Extract the base model name from a listing title.
 
     Uses a three-step strategy:
     1. Search for a known model as a distinct token in the title.
@@ -422,25 +403,28 @@ def extract_base_model(title):
     # Normalise: strip non-alphanumeric (except spaces) and uppercase
     clean = re.sub(r'[^A-Z0-9\s]', '', title.upper())
 
-    # Step 1 — look for known models (longest first to prevent U5 matching EU5)
-    for model in _MODELS_BY_LEN:
-        # Boundary check: not preceded by a letter, not followed by a letter/digit
-        if re.search(rf'(?<![A-Z]){re.escape(model)}(?![A-Z0-9])', clean):
+    # Step 1 — look for known models (longest first to prevent short names matching inside longer ones)
+    models_by_len = sorted(known_models, key=len, reverse=True)
+    for model in models_by_len:
+        model_clean = re.sub(r'[^A-Z0-9\s]', '', model.upper())
+        if re.search(rf'(?<![A-Z]){re.escape(model_clean)}(?![A-Z0-9])', clean):
             return model
 
-    # Step 2 — regex fallback + fuzzy match to known models
-    match = re.search(r'BAIC\s+(\w+\d+)', clean)
+    # Step 2 — regex fallback: look for brand prefix followed by a word/number
+    match = re.search(rf'{re.escape(brand_name.upper())}\s+(\w+(?:\s+\d+)?)', clean)
     if match:
-        candidate = match.group(1)
-        close = get_close_matches(candidate, KNOWN_MODELS, n=1, cutoff=0.6)
+        candidate = match.group(1).strip()
+        known_clean = [re.sub(r'[^A-Z0-9\s]', '', m.upper()) for m in known_models]
+        close = get_close_matches(candidate, known_clean, n=1, cutoff=0.6)
         if close:
-            return close[0]
+            idx = known_clean.index(close[0])
+            return known_models[idx]
         return candidate
 
     return "Otros"
 
 
-def _merge_similar_groups(grouped, cutoff=0.7):
+def _merge_similar_groups(grouped, known_models, cutoff=0.7):
     """Merge unknown group names into the closest known model group.
 
     Known models are never merged with each other — only truly unknown names
@@ -450,7 +434,7 @@ def _merge_similar_groups(grouped, cutoff=0.7):
     orphans = {}
 
     for name, items in grouped.items():
-        if name in KNOWN_MODELS:
+        if name in known_models:
             result[name] = list(items)
         else:
             orphans[name] = items
@@ -469,13 +453,13 @@ def _merge_similar_groups(grouped, cutoff=0.7):
     return dict(sorted(result.items()))
 
 
-def _strip_model_prefix(title, model):
-    """Remove 'Baic MODEL' prefix and redundant model name from title."""
-    # Strip "Baic MODEL" or "Baic MODELe" prefix (e.g. Bj30e)
-    cleaned = re.sub(rf'^Baic\s+{re.escape(model)}e?\s*', '', title, flags=re.IGNORECASE).strip()
-    # Remove any remaining occurrences of the model name (e.g. "1.5t Bj30 4wd")
+def _strip_model_prefix(title, model, brand_name):
+    """Remove 'Brand MODEL' prefix and redundant model name from title."""
+    cleaned = re.sub(
+        rf'^{re.escape(brand_name)}\s+{re.escape(model)}e?\s*',
+        '', title, flags=re.IGNORECASE
+    ).strip()
     cleaned = re.sub(rf'\b{re.escape(model)}e?\b', '', cleaned, flags=re.IGNORECASE).strip()
-    # Collapse multiple spaces left by removals
     cleaned = re.sub(r'\s{2,}', ' ', cleaned).strip()
     return cleaned or title
 
@@ -491,8 +475,9 @@ _SUBCAT_PATTERNS = [
     (r'\b(?:Comfort|Confort)\b', 'Comfort'),
     (r'\b4[wx][d4]\b', '4x4'),
     (r'\b(?:2wd|4x2)\b', '4x2'),
+    (r'\b(?:Phev|Plugin|Plug.in)\b', 'PHEV'),
     (r'\b(?:Electric[oa]?|100%\s*Electrico)\b', 'Electrico'),
-    (r'\b(?:Mhev|Milhybrid|Hybrid|H[ií]brida?)\b', 'Hybrid'),
+    (r'\b(?:Hev|Mhev|Milhybrid|Hybrid|H[ií]brida?)\b', 'Hybrid'),
 ]
 
 
@@ -504,7 +489,7 @@ def extract_subcategory(variant):
     return "Otros"
 
 
-def process_listings(items):
+def process_listings(items, known_models, brand_name):
     """Group listings by base model, merge similar groups, sort by price.
 
     Each item gets a 'subcategory' field added for sub-grouping.
@@ -513,13 +498,12 @@ def process_listings(items):
 
     for item in items:
         title = item.get("title", "Sin titulo") or "Sin titulo"
-        model = extract_base_model(title)
-        variant = _strip_model_prefix(title, model)
+        model = extract_base_model(title, known_models, brand_name)
+        variant = _strip_model_prefix(title, model, brand_name)
         item["subcategory"] = extract_subcategory(variant)
         grouped.setdefault(model, []).append(item)
 
-    # Merge groups with similar names (e.g. BJ30E into BJ30)
-    return _merge_similar_groups(grouped)
+    return _merge_similar_groups(grouped, known_models)
 
 
 def _format_price(entry):
@@ -529,50 +513,6 @@ def _format_price(entry):
     return f"${entry['price']:,}".replace(",", ".")
 
 
-def format_plain_text(grouped):
-    """Format grouped listings into a plain-text body for console output."""
-    if not grouped:
-        return "No se encontraron publicaciones de BAIC en Mercado Libre."
-
-    lines = []
-    lines.append("=" * 60)
-    lines.append("BAIC - Precios en Mercado Libre Argentina")
-    lines.append(f"Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
-    lines.append("=" * 60)
-    lines.append("")
-
-    total_listings = 0
-
-    for model, entries in grouped.items():
-        lines.append(f"Modelo: {model} ({len(entries)} publicaciones)")
-        lines.append("-" * 40)
-        for entry in entries:
-            price_str = _format_price(entry)
-            change = entry.get("price_change", "new")
-            diff = entry.get("price_diff", 0)
-            change_str = ""
-            if change == "up":
-                diff_fmt = f"{diff:,}".replace(",", ".")
-                change_str = f" (\u2191 +{diff_fmt})"
-            elif change == "down":
-                diff_fmt = f"{diff:,}".replace(",", ".")
-                change_str = f" (\u2193 -{diff_fmt})"
-            anticipo_str = ""
-            if entry.get("anticipo"):
-                ant_fmt = f"{entry['anticipo']:,}".replace(",", ".")
-                anticipo_str = f" (Anticipo: ${ant_fmt})"
-            loc = f"  ({entry['location']})" if entry["location"] else ""
-            lines.append(f"  {entry['title']} | {entry['seller']}: {price_str}{change_str}{anticipo_str}{loc}")
-            total_listings += 1
-        lines.append("")
-
-    lines.append("=" * 60)
-    lines.append(f"Total: {len(grouped)} modelos, {total_listings} publicaciones")
-    lines.append("=" * 60)
-
-    return "\n".join(lines)
-
-
 def _price_range_str(entries):
     """Return a 'min - max' price range string for a group of entries."""
     prices = [e for e in entries if e["price"] > 0]
@@ -580,57 +520,115 @@ def _price_range_str(entries):
         return ""
     lo = min(prices, key=lambda x: x["price"])
     hi = max(prices, key=lambda x: x["price"])
-    return f"{_format_price(lo)} — {_format_price(hi)}"
+    return f"{_format_price(lo)} \u2014 {_format_price(hi)}"
 
 
-def format_html_email(grouped):
-    """Format grouped listings into a styled HTML email body."""
+def format_plain_text(results_by_brand):
+    """Format grouped listings into a plain-text body for console output."""
+    if not results_by_brand or not any(results_by_brand.values()):
+        return "No se encontraron publicaciones en Mercado Libre."
+
+    lines = []
+    lines.append("=" * 60)
+    lines.append("Reporte de Precios - Mercado Libre Argentina")
+    lines.append(f"Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    lines.append("=" * 60)
+
+    total_listings = 0
+
+    for brand_name, grouped in results_by_brand.items():
+        if not grouped:
+            lines.append(f"\n  {brand_name}: sin publicaciones encontradas\n")
+            continue
+
+        lines.append("")
+        lines.append(f"{'#' * 60}")
+        lines.append(f"  {brand_name.upper()}")
+        lines.append(f"{'#' * 60}")
+
+        for model, entries in grouped.items():
+            lines.append(f"\nModelo: {model} ({len(entries)} publicaciones)")
+            lines.append("-" * 40)
+            for entry in entries:
+                price_str = _format_price(entry)
+                change = entry.get("price_change", "new")
+                diff = entry.get("price_diff", 0)
+                change_str = ""
+                if change == "up":
+                    diff_fmt = f"{diff:,}".replace(",", ".")
+                    change_str = f" (\u2191 +{diff_fmt})"
+                elif change == "down":
+                    diff_fmt = f"{diff:,}".replace(",", ".")
+                    change_str = f" (\u2193 -{diff_fmt})"
+                anticipo_str = ""
+                if entry.get("anticipo"):
+                    ant_fmt = f"{entry['anticipo']:,}".replace(",", ".")
+                    anticipo_str = f" (Anticipo: ${ant_fmt})"
+                loc = f"  ({entry['location']})" if entry["location"] else ""
+                lines.append(
+                    f"  {entry['title']} | {entry['seller']}: "
+                    f"{price_str}{change_str}{anticipo_str}{loc}"
+                )
+                total_listings += 1
+
+    lines.append("")
+    lines.append("=" * 60)
+    lines.append(f"Total: {total_listings} publicaciones")
+    lines.append("=" * 60)
+
+    return "\n".join(lines)
+
+
+def _build_brand_html_section(brand_name, grouped, brand_config):
+    """Build the HTML block for one brand (summary cards + model detail tables)."""
     if not grouped:
         return (
-            "<!DOCTYPE html><html><body>"
-            "<p>No se encontraron publicaciones de BAIC en Mercado Libre.</p>"
-            "</body></html>"
+            f'<div style="margin-bottom:24px;padding:16px 24px;'
+            f'background-color:#f5f5f5;border-radius:8px;color:#999;text-align:center;">'
+            f'Sin publicaciones encontradas para {brand_name}.'
+            f'</div>'
         )
 
-    date_str = datetime.now().strftime('%d/%m/%Y %H:%M')
-    total_listings = sum(len(v) for v in grouped.values())
+    header_color = brand_config.get("header_color", "#0d47a1")
+    card_color = brand_config.get("card_color", "#1a237e")
+    total = sum(len(v) for v in grouped.values())
+    price_range = _price_range_str([e for entries in grouped.values() for e in entries])
 
-    # --- summary cards with anchor links ---
+    # Summary cards (one per model)
     summary_cards = []
     for model, entries in grouped.items():
-        anchor = model.lower()
+        anchor = f"{brand_name.lower()}-{re.sub(r'[^a-z0-9]', '-', model.lower())}"
         summary_cards.append(
             f'<td style="padding:0 6px 12px 6px;text-align:center;">'
             f'<a href="#{anchor}" style="text-decoration:none;color:#ffffff;">'
-            f'<div style="background-color:#1a237e;border-radius:8px;padding:14px 18px;min-width:100px;">'
-            f'<div style="font-size:20px;font-weight:700;letter-spacing:0.5px;">{model}</div>'
-            f'<div style="font-size:12px;margin-top:4px;opacity:0.85;">'
-            f'{len(entries)} pub.</div>'
+            f'<div style="background-color:{card_color};border-radius:8px;'
+            f'padding:14px 18px;min-width:90px;">'
+            f'<div style="font-size:18px;font-weight:700;letter-spacing:0.5px;">{model}</div>'
+            f'<div style="font-size:11px;margin-top:4px;opacity:0.85;">{len(entries)} pub.</div>'
             f'</div></a></td>'
         )
     summary_cards_html = "".join(summary_cards)
 
-    # Column header template
-    th_style = ('padding:10px 14px;font-weight:600;color:#37474f;'
-                'border-bottom:2px solid #c5cae9;font-size:12px;'
-                'text-transform:uppercase;letter-spacing:0.5px;')
+    th_style = (
+        'padding:10px 14px;font-weight:600;color:#37474f;'
+        'border-bottom:2px solid #c5cae9;font-size:12px;'
+        'text-transform:uppercase;letter-spacing:0.5px;'
+    )
 
-    # --- model sections with subcategories ---
+    # Model detail sections
     sections = []
     for model, entries in grouped.items():
-        anchor = model.lower()
-        price_range = _price_range_str(entries)
+        anchor = f"{brand_name.lower()}-{re.sub(r'[^a-z0-9]', '-', model.lower())}"
+        model_range = _price_range_str(entries)
 
-        # Group entries by subcategory
+        # Group by subcategory
         subcats = {}
         for entry in entries:
             sc = entry.get("subcategory", "Otros")
             subcats.setdefault(sc, []).append(entry)
 
-        # Build sub-tables for each subcategory
         subcat_html_parts = []
         for sc_name, sc_entries in subcats.items():
-            sc_count = len(sc_entries)
             sc_range = _price_range_str(sc_entries)
             range_text = f' &mdash; {sc_range}' if sc_range else ''
 
@@ -638,11 +636,16 @@ def format_html_email(grouped):
             for i, entry in enumerate(sc_entries):
                 bg = "#f4f6fb" if i % 2 == 0 else "#ffffff"
                 price_str = _format_price(entry)
-                variant = _strip_model_prefix(entry["title"], model)
-                seller = entry["seller"] if entry["seller"] != "N/A" else '<span style="color:#999;">\u2014</span>'
-                location = entry["location"] if entry["location"] else '<span style="color:#999;">\u2014</span>'
+                variant = _strip_model_prefix(entry["title"], model, brand_name)
+                seller = (
+                    entry["seller"] if entry["seller"] != "N/A"
+                    else '<span style="color:#999;">\u2014</span>'
+                )
+                location = (
+                    entry["location"] if entry["location"]
+                    else '<span style="color:#999;">\u2014</span>'
+                )
 
-                # Price change indicator
                 change = entry.get("price_change", "new")
                 diff = entry.get("price_diff", 0)
                 change_html = ""
@@ -659,7 +662,6 @@ def format_html_email(grouped):
                         f'\u2193 -{diff_fmt}</span>'
                     )
 
-                # Anticipo indicator
                 anticipo_html = ""
                 if entry.get("anticipo"):
                     ant_fmt = f"{entry['anticipo']:,}".replace(",", ".")
@@ -668,63 +670,59 @@ def format_html_email(grouped):
                         f'Anticipo: ${ant_fmt}</span>'
                     )
 
-                # NUEVA badge for new listings
                 nueva_badge = ""
                 if change == "new":
                     nueva_badge = (
-                        ' <span style="display:inline-block;background-color:#ff6f00;color:#fff;'
-                        'font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;'
-                        'vertical-align:middle;margin-left:4px;">NUEVA</span>'
+                        ' <span style="display:inline-block;background-color:#ff6f00;'
+                        'color:#fff;font-size:9px;font-weight:700;padding:1px 5px;'
+                        'border-radius:3px;vertical-align:middle;margin-left:4px;">NUEVA</span>'
                     )
 
                 rows.append(
                     f'<tr style="background-color:{bg};">'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;">'
                     f'{variant}{nueva_badge}</td>'
-                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#444;">{seller}</td>'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#444;">'
+                    f'{seller}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:right;'
-                    f'font-weight:700;color:#1b5e20;white-space:nowrap;">{price_str}{change_html}{anticipo_html}</td>'
-                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#555;">{location}</td>'
+                    f'font-weight:700;color:#1b5e20;white-space:nowrap;">'
+                    f'{price_str}{change_html}{anticipo_html}</td>'
+                    f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;color:#555;">'
+                    f'{location}</td>'
                     f'<td style="padding:10px 14px;border-bottom:1px solid #eef0f4;text-align:center;">'
                     f'<a href="{entry["url"]}" target="_blank" style="display:inline-block;'
-                    f'background-color:#2962ff;color:#ffffff;padding:5px 12px;border-radius:4px;'
-                    f'font-size:12px;font-weight:600;text-decoration:none;">Ver</a></td>'
+                    f'background-color:{header_color};color:#ffffff;padding:5px 12px;'
+                    f'border-radius:4px;font-size:12px;font-weight:600;text-decoration:none;">'
+                    f'Ver</a></td>'
                     f'</tr>'
                 )
-            rows_html = "\n".join(rows)
 
-            # Subcategory header row + table
             subcat_html_parts.append(
-                # sub-header
                 f'<tr><td colspan="5" style="background-color:#e8eaf6;padding:8px 14px;'
                 f'font-weight:700;color:#283593;font-size:13px;border-bottom:1px solid #c5cae9;">'
                 f'{sc_name} '
-                f'<span style="font-weight:400;color:#5c6bc0;">({sc_count}){range_text}</span>'
+                f'<span style="font-weight:400;color:#5c6bc0;">({len(sc_entries)}){range_text}</span>'
                 f'</td></tr>'
-                + rows_html
+                + "\n".join(rows)
             )
 
-        all_rows_html = "\n".join(subcat_html_parts)
-
         range_badge = ""
-        if price_range:
+        if model_range:
             range_badge = (
                 f'<span style="float:right;font-size:13px;font-weight:400;'
-                f'opacity:0.9;margin-top:2px;">{price_range}</span>'
+                f'opacity:0.9;margin-top:2px;">{model_range}</span>'
             )
 
         sections.append(
-            f'<div id="{anchor}" style="margin-bottom:32px;">'
-            # section header
+            f'<div id="{anchor}" style="margin-bottom:24px;">'
             f'<table width="100%" cellpadding="0" cellspacing="0" style="border:none;">'
-            f'<tr><td style="background-color:#0d47a1;padding:14px 20px;'
-            f'border-radius:10px 10px 0 0;color:#ffffff;font-size:17px;font-weight:700;">'
-            f'BAIC {model} '
+            f'<tr><td style="background-color:{header_color};padding:12px 20px;'
+            f'border-radius:10px 10px 0 0;color:#ffffff;font-size:16px;font-weight:700;">'
+            f'{brand_name} {model} '
             f'<span style="font-weight:400;font-size:13px;background-color:rgba(255,255,255,0.2);'
             f'padding:2px 10px;border-radius:12px;margin-left:6px;">{len(entries)}</span>'
             f'{range_badge}'
             f'</td></tr></table>'
-            # data table with subcategory rows
             f'<table width="100%" cellpadding="0" cellspacing="0" '
             f'style="border-collapse:collapse;border:1px solid #dde2ea;border-top:none;font-size:13px;">'
             f'<thead><tr style="background-color:#e8eaf6;">'
@@ -734,15 +732,55 @@ def format_html_email(grouped):
             f'<th style="{th_style}text-align:left;">Ubicaci\u00f3n</th>'
             f'<th style="{th_style}text-align:center;">Link</th>'
             f'</tr></thead>'
-            f'<tbody>{all_rows_html}</tbody>'
+            f'<tbody>{"".join(subcat_html_parts)}</tbody>'
             f'</table>'
             f'</div>'
         )
 
-    sections_html = "\n".join(sections)
+    range_badge_total = (
+        f'<span style="float:right;font-size:12px;font-weight:400;opacity:0.85;margin-top:3px;">'
+        f'{price_range}</span>'
+        if price_range else ''
+    )
 
-    # --- price changes summary ---
-    all_entries = [e for entries in grouped.values() for e in entries]
+    return (
+        # Brand header bar
+        f'<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">'
+        f'<tr><td style="background-color:{header_color};padding:18px 24px;'
+        f'border-radius:10px;color:#ffffff;">'
+        f'<span style="font-size:22px;font-weight:700;letter-spacing:0.5px;">{brand_name}</span>'
+        f'<span style="font-size:13px;margin-left:12px;opacity:0.85;">'
+        f'{total} publicaciones &bull; {len(grouped)} modelos</span>'
+        f'{range_badge_total}'
+        f'</td></tr></table>'
+        # Summary cards
+        f'<table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">'
+        f'<tr>{summary_cards_html}</tr>'
+        f'</table>'
+        # Model sections
+        + "".join(sections)
+    )
+
+
+def format_html_email(results_by_brand):
+    """Format all brands into a single styled HTML email (dashboard layout)."""
+    if not results_by_brand or not any(results_by_brand.values()):
+        return (
+            "<!DOCTYPE html><html><body>"
+            "<p>No se encontraron publicaciones en Mercado Libre.</p>"
+            "</body></html>"
+        )
+
+    date_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+
+    # Aggregate price changes across all brands
+    all_entries = [
+        e
+        for grouped in results_by_brand.values()
+        for entries in grouped.values()
+        for e in entries
+    ]
+    total_listings = len(all_entries)
     n_up = sum(1 for e in all_entries if e.get("price_change") == "up")
     n_down = sum(1 for e in all_entries if e.get("price_change") == "down")
     n_new = sum(1 for e in all_entries if e.get("price_change") == "new")
@@ -752,62 +790,57 @@ def format_html_email(grouped):
     if n_up or n_down or n_new:
         parts = []
         if n_up:
-            parts.append(
-                f'<span style="color:#c62828;font-weight:600;">\u2191 {n_up} subieron</span>'
-            )
+            parts.append(f'<span style="color:#c62828;font-weight:600;">\u2191 {n_up} subieron</span>')
         if n_down:
-            parts.append(
-                f'<span style="color:#2e7d32;font-weight:600;">\u2193 {n_down} bajaron</span>'
-            )
+            parts.append(f'<span style="color:#2e7d32;font-weight:600;">\u2193 {n_down} bajaron</span>')
         if n_same:
             parts.append(f'<span style="color:#555;">= {n_same} sin cambio</span>')
         if n_new:
-            parts.append(
-                f'<span style="color:#ff6f00;font-weight:600;">{n_new} nuevas</span>'
-            )
+            parts.append(f'<span style="color:#ff6f00;font-weight:600;">{n_new} nuevas</span>')
         changes_summary = (
             '<tr><td style="padding:0 30px 16px;text-align:center;">'
-            '<div style="background-color:#f5f6fa;border-radius:8px;padding:10px 16px;'
-            'font-size:13px;">'
+            '<div style="background-color:#f5f6fa;border-radius:8px;padding:10px 16px;font-size:13px;">'
             f'{" &bull; ".join(parts)}'
             '</div></td></tr>'
         )
+
+    # Build each brand's section
+    brand_sections = []
+    for brand_name, grouped in results_by_brand.items():
+        brand_config = BRANDS.get(brand_name, {})
+        brand_sections.append(
+            _build_brand_html_section(brand_name, grouped, brand_config)
+        )
+    # Separate brands with a horizontal divider
+    brands_html = '<hr style="border:none;border-top:2px solid #e0e3eb;margin:32px 0;">'.join(
+        brand_sections
+    )
 
     return (
         '<!DOCTYPE html>'
         '<html lang="es"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1.0">'
         '</head>'
-        '<body style="margin:0;padding:0;background-color:#eef1f7;-webkit-font-smoothing:antialiased;">'
-        '<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#eef1f7;padding:24px 0;">'
+        '<body style="margin:0;padding:0;background-color:#eef1f7;'
+        '-webkit-font-smoothing:antialiased;">'
+        '<table width="100%" cellpadding="0" cellspacing="0" '
+        'style="background-color:#eef1f7;padding:24px 0;">'
         '<tr><td align="center">'
-        # main container
-        '<table width="680" cellpadding="0" cellspacing="0" '
+        '<table width="720" cellpadding="0" cellspacing="0" '
         'style="background-color:#ffffff;border-radius:12px;overflow:hidden;'
-        'box-shadow:0 2px 12px rgba(0,0,0,0.08);font-family:\'Segoe UI\',Arial,Helvetica,sans-serif;">'
+        'box-shadow:0 2px 12px rgba(0,0,0,0.08);'
+        'font-family:\'Segoe UI\',Arial,Helvetica,sans-serif;">'
         # HEADER
-        '<tr><td style="background-color:#0d47a1;padding:32px 30px 24px;text-align:center;">'
-        '<h1 style="margin:0;font-size:26px;color:#ffffff;font-weight:700;letter-spacing:0.3px;">'
-        'BAIC &mdash; Precios Mercado Libre</h1>'
-        f'<p style="margin:8px 0 0;font-size:14px;color:rgba(255,255,255,0.8);">'
-        f'Reporte generado el {date_str}</p>'
-        '</td></tr>'
-        # SUMMARY ROW
-        '<tr><td style="padding:20px 24px 8px;">'
-        '<table cellpadding="0" cellspacing="0" style="width:100%;">'
-        f'<tr>{summary_cards_html}</tr>'
-        '</table>'
-        '</td></tr>'
-        # TOTAL BADGE
-        '<tr><td style="padding:4px 30px 20px;text-align:center;">'
-        f'<span style="display:inline-block;background-color:#e8eaf6;color:#283593;'
-        f'padding:6px 20px;border-radius:20px;font-size:13px;font-weight:600;">'
-        f'{total_listings} publicaciones en {len(grouped)} modelos</span>'
+        '<tr><td style="background-color:#212121;padding:28px 30px 20px;text-align:center;">'
+        '<h1 style="margin:0;font-size:24px;color:#ffffff;font-weight:700;letter-spacing:0.3px;">'
+        'Reporte de Precios &mdash; Mercado Libre Argentina</h1>'
+        f'<p style="margin:8px 0 0;font-size:13px;color:rgba(255,255,255,0.75);">'
+        f'Generado el {date_str} &bull; {total_listings} publicaciones totales</p>'
         '</td></tr>'
         # PRICE CHANGES SUMMARY
         f'{changes_summary}'
-        # SECTIONS
-        f'<tr><td style="padding:0 24px 24px;">{sections_html}</td></tr>'
+        # BRAND SECTIONS
+        f'<tr><td style="padding:24px 24px 8px;">{brands_html}</td></tr>'
         # FOOTER
         '<tr><td style="background-color:#f5f6fa;padding:20px 30px;text-align:center;'
         'border-top:1px solid #e0e3eb;">'
@@ -847,27 +880,48 @@ def send_email(subject, plain_body, html_body):
 
 
 def main():
-    print(f"Iniciando scraper BAIC - {datetime.now()}")
+    print(f"Iniciando scraper - {datetime.now()}")
 
-    try:
-        items = fetch_all_listings()
-    except Exception as e:
-        print(f"ERROR al obtener publicaciones: {e}")
-        sys.exit(1)
+    all_results = {}  # brand_name -> {"grouped": ..., "items": ..., "prices_file": ...}
 
-    # Price change tracking
-    previous_prices = load_previous_prices()
-    compute_price_changes(items, previous_prices)
+    for brand_name, brand_config in BRANDS.items():
+        print(f"\n{'=' * 50}")
+        print(f"Procesando: {brand_name}")
+        print(f"{'=' * 50}")
 
-    n_up = sum(1 for i in items if i.get("price_change") == "up")
-    n_down = sum(1 for i in items if i.get("price_change") == "down")
-    n_new = sum(1 for i in items if i.get("price_change") == "new")
-    n_same = sum(1 for i in items if i.get("price_change") == "same")
-    print(f"Cambios de precio: {n_up} subieron, {n_down} bajaron, {n_same} sin cambio, {n_new} nuevas")
+        try:
+            items = fetch_all_listings(
+                brand_name,
+                brand_config["base_url"],
+                brand_config["apify_keywords"],
+                brand_config.get("min_listings_threshold", 200),
+            )
+        except Exception as e:
+            print(f"ERROR al obtener publicaciones de {brand_name}: {e}")
+            items = []
 
-    grouped = process_listings(items)
-    plain_body = format_plain_text(grouped)
-    html_body = format_html_email(grouped)
+        previous_prices = load_previous_prices(brand_config["prices_file"])
+        compute_price_changes(items, previous_prices)
+
+        n_up = sum(1 for i in items if i.get("price_change") == "up")
+        n_down = sum(1 for i in items if i.get("price_change") == "down")
+        n_new = sum(1 for i in items if i.get("price_change") == "new")
+        n_same = sum(1 for i in items if i.get("price_change") == "same")
+        print(
+            f"[{brand_name}] Cambios: {n_up} subieron, {n_down} bajaron, "
+            f"{n_same} sin cambio, {n_new} nuevas"
+        )
+
+        grouped = process_listings(items, brand_config["known_models"], brand_name)
+        all_results[brand_name] = {
+            "grouped": grouped,
+            "items": items,
+            "prices_file": brand_config["prices_file"],
+        }
+
+    results_by_brand = {brand: data["grouped"] for brand, data in all_results.items()}
+    plain_body = format_plain_text(results_by_brand)
+    html_body = format_html_email(results_by_brand)
 
     print("\n--- CONTENIDO DEL EMAIL ---")
     print(plain_body)
@@ -879,7 +933,9 @@ def main():
         print(f"ERROR al enviar email: {e}")
         sys.exit(1)
 
-    save_current_prices(items)
+    for brand_name, data in all_results.items():
+        save_current_prices(data["items"], data["prices_file"])
+
     print("Listo.")
 
 
