@@ -247,15 +247,23 @@ def parse_page(html):
             price = 0
             anticipo = 0
 
-        # Extract seller name
+        # Extract seller name — try multiple class patterns, fall back to "Particular"
         seller_match = re.search(
             r'class="poly-component__seller[^"]*"[^>]*>([^<]+)', card
+        ) or re.search(
+            r'class="[^"]*seller[^"]*"[^>]*>([^<]+)', card
+        ) or re.search(
+            r'data-testid="[^"]*seller[^"]*"[^>]*>([^<]+)', card
         )
-        seller = seller_match.group(1).strip() if seller_match else "N/A"
+        seller = seller_match.group(1).strip() if seller_match else "Particular"
 
-        # Extract location
+        # Extract location — try multiple class patterns
         location_match = re.search(
             r'class="poly-component__location[^"]*"[^>]*>([^<]+)', card
+        ) or re.search(
+            r'class="[^"]*location[^"]*"[^>]*>([^<]+)', card
+        ) or re.search(
+            r'class="[^"]*ciudad[^"]*"[^>]*>([^<]+)', card
         )
         location = location_match.group(1).strip() if location_match else ""
 
@@ -283,13 +291,34 @@ def _apify_convert_item(item):
     moneda = item.get("Moneda", "ARS $") or "ARS $"
     currency = "U$S" if "US" in moneda.upper() else "$"
 
+    # Try multiple field names for seller; fall back to "Particular"
+    seller = (
+        item.get("Vendedor")
+        or item.get("vendedor")
+        or item.get("nombreVendedor")
+        or item.get("tienda")
+        or item.get("seller")
+        or "Particular"
+    )
+
+    # Try multiple field names for location
+    location = (
+        item.get("ubicacion")
+        or item.get("Ubicacion")
+        or item.get("ciudad")
+        or item.get("Ciudad")
+        or item.get("provincia")
+        or item.get("Provincia")
+        or ""
+    )
+
     return {
         "title": item.get("articuloTitulo", ""),
-        "seller": item.get("Vendedor", "") or "N/A",
+        "seller": seller.strip(),
         "price": price,
         "anticipo": 0,
         "currency": currency,
-        "location": "",
+        "location": location.strip(),
         "url": item.get("zdireccion", ""),
     }
 
@@ -685,14 +714,8 @@ def _build_brand_html_section(brand_name, grouped, brand_config, summary=""):
                 bg = "#f4f6fb" if i % 2 == 0 else "#ffffff"
                 price_str = _format_price(entry)
                 variant = _strip_model_prefix(entry["title"], model, brand_name)
-                seller = (
-                    entry["seller"] if entry["seller"] != "N/A"
-                    else '<span style="color:#999;">\u2014</span>'
-                )
-                location = (
-                    entry["location"] if entry["location"]
-                    else '<span style="color:#999;">\u2014</span>'
-                )
+                seller = entry["seller"] if entry["seller"] else "Particular"
+                location = entry["location"] if entry["location"] else '<span style="color:#999;">Sin datos</span>'
 
                 change = entry.get("price_change", "new")
                 diff = entry.get("price_diff", 0)
@@ -1308,8 +1331,8 @@ function renderTable() {
     else if (item.price_change === 'down' && item.price_diff)
       delta = '<span class="price-delta down">↓ -'+fmtNum(item.price_diff)+'</span>';
     const newBadge = item.price_change === 'new' ? '<span class="badge-new">NUEVA</span>' : '';
-    const seller = item.seller !== 'N/A' ? item.seller : '<span style="color:#ccc">—</span>';
-    const loc    = item.location || '<span style="color:#ccc">—</span>';
+    const seller = item.seller || 'Particular';
+    const loc    = item.location || '<span style="color:#94a3b8;font-size:11px;">Sin datos</span>';
     return '<tr>' +
       '<td><span class="badge-model">'+item.model+'</span></td>' +
       '<td>'+item.variant+newBadge+'</td>' +
