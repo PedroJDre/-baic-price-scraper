@@ -228,6 +228,62 @@ def fetch_page(url, retries=2):
     raise last_exc
 
 
+def _parse_price_from_card(card):
+    """Extract the best price integer from a card HTML chunk.
+
+    MercadoLibre's poly-card splits prices across two spans:
+      <span class="andes-money-amount__fraction">33.299</span>
+      <span class="andes-money-amount__cents">900</span>  ← superscript suffix
+
+    We need to combine both to get the full number (33299900).
+    We also try aria-label as a more reliable source.
+    """
+    # Strategy 1: aria-label on the price container (most reliable)
+    # e.g. aria-label="33 millones 299 mil 900 pesos" — extract all digits
+    aria_match = re.search(
+        r'class="[^"]*andes-money-amount[^"]*"[^>]*aria-label="([^"]+)"', card
+    )
+    if aria_match:
+        digits = re.sub(r'[^\d]', '', aria_match.group(1))
+        if digits and len(digits) >= 4:
+            return int(digits), None  # price, no cents split needed
+
+    # Strategy 2: fraction + cents combined
+    # Find all price blocks: each has a fraction and optional cents
+    price_blocks = re.findall(
+        r'class="andes-money-amount__fraction"[^>]*>([^<]+)</span>'
+        r'(?:.*?class="andes-money-amount__cents[^"]*"[^>]*>([^<]+))?',
+        card, re.DOTALL
+    )
+
+    parsed = []
+    for fraction, cents in price_blocks:
+        try:
+            frac_int = int(fraction.strip().replace(".", "").replace(",", ""))
+            if cents:
+                cents_clean = re.sub(r'[^\d]', '', cents.strip())
+                if cents_clean:
+                    # Combine: fraction is main digits, cents is suffix
+                    combined = int(f"{frac_int}{cents_clean}")
+                    parsed.append(combined)
+                else:
+                    parsed.append(frac_int)
+            else:
+                parsed.append(frac_int)
+        except ValueError:
+            pass
+
+    # Strategy 3: fraction only (fallback)
+    if not parsed:
+        for ps in re.findall(r'class="andes-money-amount__fraction"[^>]*>([^<]+)', card):
+            try:
+                parsed.append(int(ps.strip().replace(".", "").replace(",", "")))
+            except ValueError:
+                pass
+
+    return None, parsed
+
+
 def parse_page(html):
     """Extract listing data from a page's HTML using regex.
 
@@ -236,17 +292,19 @@ def parse_page(html):
     """
     listings = []
 
-    # Split HTML into individual listing cards
-    cards = re.findall(
-        r'<li class="ui-search-layout__item[^"]*"[^>]*>(.*?)</li>',
-        html,
-        re.DOTALL,
-    )
+    # Split on card openings — avoids lazy .* cutting at nested </li> tags
+    parts = re.split(r'(?=<li[^>]+class="[^"]*ui-search-layout__item)', html)
+
+    cards = []
+    for part in parts:
+        if 'ui-search-layout__item' in part:
+            # Each part ends just before the next card — that's our card
+            cards.append(part)
 
     for card in cards:
         # Extract item URL
         url_match = re.search(
-            r'href="(https://auto\.mercadolibre\.com\.ar/MLA-[^"]+)"', card
+            r'href="(https://auto\.mercadolibre\.com\.ar/MLA-[^"#]+)"', card
         )
         if not url_match:
             continue
@@ -261,35 +319,26 @@ def parse_page(html):
         )
         title = re.sub(r"<[^>]+>", "", title_match.group(1)).strip() if title_match else ""
 
-        # Extract all prices from the card
-        price_strs = re.findall(
-            r'class="andes-money-amount__fraction"[^>]*>([^<]+)', card
-        )
-
         # Extract currency symbol
         currency_match = re.search(
             r'class="andes-money-amount__currency-symbol"[^>]*>([^<]+)', card
         )
         currency = currency_match.group(1).strip() if currency_match else "$"
 
-        # Detect anticipo: check if card contains "anticipo" text
+        # Detect anticipo
         has_anticipo = bool(re.search(r'anticipo', card, re.IGNORECASE))
 
-        # Parse all prices to integers
-        parsed_prices = []
-        for ps in price_strs:
-            try:
-                parsed_prices.append(int(ps.strip().replace(".", "")))
-            except ValueError:
-                pass
+        # Extract prices using combined fraction+cents strategy
+        aria_price, parsed_prices = _parse_price_from_card(card)
 
-        if has_anticipo and len(parsed_prices) >= 2:
-            # When anticipo is present, the larger value is the full price
-            # and the smaller value is the anticipo (down payment)
+        if aria_price:
+            price = aria_price
+            anticipo = 0
+        elif has_anticipo and parsed_prices and len(parsed_prices) >= 2:
             price = max(parsed_prices)
             anticipo = min(parsed_prices)
         elif parsed_prices:
-            price = parsed_prices[0]
+            price = max(parsed_prices)  # take largest to avoid partial prices
             anticipo = 0
         else:
             price = 0
