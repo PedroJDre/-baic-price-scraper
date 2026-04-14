@@ -13,6 +13,7 @@ from urllib.parse import urlencode
 
 import anthropic
 import requests
+from supabase import create_client
 
 from config import (
     BRANDS,
@@ -41,6 +42,8 @@ from config import (
     HISTORY_MAX_ENTRIES,
     REPORT_FILE,
     GITHUB_PAGES_URL,
+    SUPABASE_URL,
+    SUPABASE_KEY,
 )
 
 
@@ -1446,6 +1449,97 @@ def generate_interactive_report(results_by_brand, summaries_by_brand, history):
     print(f"Reporte interactivo guardado en {report_path}")
 
 
+def _get_supabase_client():
+    """Return a Supabase client or None if not configured."""
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return None
+    return create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+def save_to_supabase(brand_name, grouped, items, run_date_str):
+    """Upsert current run data into Supabase (listings, model_stats, runs).
+
+    Uses upsert with on_conflict so re-runs on the same date are idempotent.
+    Skips silently if Supabase is not configured.
+    """
+    client = _get_supabase_client()
+    if not client:
+        print("Supabase no configurado, omitiendo")
+        return
+
+    print(f"[{brand_name}] Guardando en Supabase...")
+
+    # --- listings ---
+    listing_rows = []
+    for model, entries in grouped.items():
+        for e in entries:
+            variant = _strip_model_prefix(e.get("title", ""), model, brand_name)
+            listing_rows.append({
+                "run_date":     run_date_str,
+                "brand":        brand_name,
+                "model":        model,
+                "variant":      variant,
+                "subcategory":  e.get("subcategory", "Otros"),
+                "seller":       e.get("seller", "Particular"),
+                "price":        e.get("price", 0),
+                "currency":     e.get("currency", "$"),
+                "price_change": e.get("price_change", "new"),
+                "price_diff":   e.get("price_diff", 0),
+                "anticipo":     e.get("anticipo", 0),
+                "location":     e.get("location", ""),
+                "url":          e.get("url", ""),
+            })
+
+    if listing_rows:
+        # Batch in chunks of 500 to stay within Supabase request limits
+        chunk_size = 500
+        for i in range(0, len(listing_rows), chunk_size):
+            chunk = listing_rows[i:i + chunk_size]
+            client.table("listings").upsert(chunk, on_conflict="run_date,url").execute()
+        print(f"  {len(listing_rows)} listings guardados")
+
+    # --- model_stats ---
+    stats = _compute_brand_stats(brand_name, grouped, items)
+    model_rows = []
+    for model, ms in stats.get("models", {}).items():
+        model_rows.append({
+            "run_date":  run_date_str,
+            "brand":     brand_name,
+            "model":     model,
+            "avg_price": ms.get("avg"),
+            "min_price": ms.get("min"),
+            "max_price": ms.get("max"),
+            "count":     ms.get("count", 0),
+            "n_up":      ms.get("n_up", 0),
+            "n_down":    ms.get("n_down", 0),
+            "n_new":     ms.get("n_new", 0),
+        })
+
+    if model_rows:
+        client.table("model_stats").upsert(
+            model_rows, on_conflict="run_date,brand,model"
+        ).execute()
+        print(f"  {len(model_rows)} model_stats guardados")
+
+    # --- runs summary ---
+    avgs = [ms.get("avg", 0) for ms in stats.get("models", {}).values() if ms.get("avg")]
+    prices = [e.get("price", 0) for e in items if e.get("price", 0) > 0]
+    run_row = {
+        "run_date":  run_date_str,
+        "brand":     brand_name,
+        "total":     stats.get("total", 0),
+        "avg_price": round(sum(avgs) / len(avgs)) if avgs else None,
+        "min_price": min(prices) if prices else None,
+        "max_price": max(prices) if prices else None,
+        "n_up":      sum(ms.get("n_up", 0)   for ms in stats.get("models", {}).values()),
+        "n_down":    sum(ms.get("n_down", 0) for ms in stats.get("models", {}).values()),
+        "n_new":     sum(ms.get("n_new", 0)  for ms in stats.get("models", {}).values()),
+        "n_same":    sum(1 for e in items if e.get("price_change") == "same"),
+    }
+    client.table("runs").upsert(run_row, on_conflict="run_date,brand").execute()
+    print(f"  Run summary guardado")
+
+
 def send_email(subject, plain_body, html_body):
     """Send the email via Gmail SMTP with HTML + plain text fallback."""
     if not EMAIL_SENDER or not EMAIL_PASSWORD:
@@ -1543,6 +1637,12 @@ def main():
 
     for brand_name, data in all_results.items():
         save_current_prices(data["items"], data["prices_file"])
+        try:
+            save_to_supabase(
+                brand_name, data["grouped"], data["items"], today
+            )
+        except Exception as e:
+            print(f"[{brand_name}] ERROR al guardar en Supabase: {e}")
 
     save_history(history)
     generate_interactive_report(results_by_brand, summaries_by_brand, history)

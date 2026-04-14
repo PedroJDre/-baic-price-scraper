@@ -15,6 +15,10 @@ HEADERS = {
     "Accept-Language": "es-AR,es;q=0.9",
 }
 
+# --- Supabase ---
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "")  # service_role key
+
 # --- Interactive report (GitHub Pages) ---
 REPORT_FILE = "docs/index.html"
 GITHUB_PAGES_URL = "https://pedrojdre.github.io/-baic-price-scraper/"
