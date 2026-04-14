@@ -630,6 +630,7 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
     else:
         print(f"[{brand_name}] ScraperAPI no configurado, usando solicitudes directas")
 
+    consecutive_empty = 0
     for page in range(1, MAX_PAGES + 1):
         url = build_page_url(page, base_url)
         print(f"[{brand_name}] Pagina {page}: {url}")
@@ -644,6 +645,7 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
         print(f"  {len(listings)} publicaciones encontradas")
 
         if not listings:
+            consecutive_empty += 1
             if page == 1:
                 print(f"  DEBUG: HTML length = {len(html)}")
                 print(f"  DEBUG: Has 'ui-search-layout': {'ui-search-layout' in html}")
@@ -657,12 +659,19 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
                 mla_idx = html.find('/MLA-')
                 if mla_idx >= 0:
                     print(f"  DEBUG: MLA URL context: {repr(html[max(0,mla_idx-50):mla_idx+80])}")
-            break
-
-        all_listings.extend(listings)
+            if consecutive_empty >= 2:
+                print(f"  2 paginas vacias consecutivas — fin de resultados")
+                break
+            print(f"  Pagina vacia — reintentando siguiente pagina...")
+        else:
+            consecutive_empty = 0
+            all_listings.extend(listings)
 
         if page < MAX_PAGES:
             time.sleep(REQUEST_DELAY_SECONDS)
+
+    if page == MAX_PAGES and listings:
+        print(f"  AVISO: Se alcanzo el limite de {MAX_PAGES} paginas — pueden existir mas resultados")
 
     print(f"[{brand_name}] Total publicaciones (scraping directo): {len(all_listings)}")
 
@@ -671,12 +680,14 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
         print(f"[{brand_name}] Pocas publicaciones ({len(all_listings)}), complementando con Apify...")
         apify_listings = fetch_via_apify(apify_keywords)
 
-        # Merge: deduplicate by URL
-        seen_urls = {item["url"] for item in all_listings if item["url"]}
+        # Merge: deduplicate by URL (normalize both sides — strip #fragment)
+        seen_urls = {item["url"].split('#')[0] for item in all_listings if item["url"]}
         new_count = 0
         for item in apify_listings:
-            if item["url"] and item["url"] not in seen_urls:
-                seen_urls.add(item["url"])
+            norm_url = item["url"].split('#')[0] if item["url"] else ""
+            if norm_url and norm_url not in seen_urls:
+                seen_urls.add(norm_url)
+                item["url"] = norm_url  # store normalized URL
                 all_listings.append(item)
                 new_count += 1
 
@@ -737,7 +748,7 @@ def _merge_similar_groups(grouped, known_models, cutoff=0.7):
         targets = list(result.keys()) or list(grouped.keys())
         close = get_close_matches(name, targets, n=1, cutoff=cutoff)
         if close:
-            result[close[0]].extend(items)
+            result.setdefault(close[0], []).extend(items)
         else:
             result[name] = list(items)
 
@@ -1935,12 +1946,7 @@ def main():
     print(plain_body)
     print("--- FIN DEL EMAIL ---\n")
 
-    try:
-        send_email(EMAIL_SUBJECT, plain_body, html_body)
-    except Exception as e:
-        print(f"ERROR al enviar email: {e}")
-        sys.exit(1)
-
+    # Save data BEFORE emailing — so a transient email failure never loses scraped data
     for brand_name, data in all_results.items():
         if data["scraped_fresh"]:
             # Only save to disk/Supabase when we actually scraped new data
@@ -1956,6 +1962,13 @@ def main():
 
     save_history(history)
     generate_interactive_report(results_by_brand, summaries_by_brand, history)
+
+    try:
+        send_email(EMAIL_SUBJECT, plain_body, html_body)
+    except Exception as e:
+        print(f"ERROR al enviar email: {e}")
+        sys.exit(1)
+
     print("Listo.")
 
 
