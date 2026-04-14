@@ -32,6 +32,14 @@ from config import (
     ZENROWS_URL,
     CRAWLBASE_TOKEN,
     CRAWLBASE_URL,
+    SCRAPFLY_API_KEY,
+    SCRAPFLY_URL,
+    WEBSCRAPINGAPI_KEY,
+    WEBSCRAPINGAPI_URL,
+    HASDATA_API_KEY,
+    HASDATA_URL,
+    SCRAPINGDOG_API_KEY,
+    SCRAPINGDOG_URL,
     APIFY_API_TOKEN,
     APIFY_ACTOR_ID,
     SMTP_SERVER,
@@ -186,6 +194,55 @@ def _crawlbase_request(url):
     return requests.get(CRAWLBASE_URL, params=params, timeout=120)
 
 
+def _scrapfly_request(url):
+    """ScrapFly: JS rendering with anti-scraping bypass. ~1-10 credits/req."""
+    params = {
+        "key": SCRAPFLY_API_KEY,
+        "url": url,
+        "render_js": "true",
+        "asp": "true",          # anti-scraping protection bypass
+        "country": "AR",
+        "wait": 5000,
+    }
+    return requests.get(SCRAPFLY_URL, params=params, timeout=120)
+
+
+def _webscrapingapi_request(url):
+    """WebScrapingAPI: JS rendering with residential proxies."""
+    params = {
+        "api_key": WEBSCRAPINGAPI_KEY,
+        "url": url,
+        "render_js": "1",
+        "proxy_type": "residential",
+        "country_code": "AR",
+        "wait_for_css": "li.ui-search-layout__item",
+    }
+    return requests.get(WEBSCRAPINGAPI_URL, params=params, timeout=120)
+
+
+def _hasdata_request(url):
+    """HasData: Chrome-based scraping with JS rendering."""
+    params = {
+        "api_key": HASDATA_API_KEY,
+        "url": url,
+        "proxyCountry": "AR",
+        "wait": 5000,
+    }
+    return requests.get(HASDATA_URL, params=params, timeout=120)
+
+
+def _scrapingdog_request(url):
+    """ScrapingDog: JS rendering with residential proxies."""
+    params = {
+        "api_key": SCRAPINGDOG_API_KEY,
+        "url": url,
+        "dynamic": "true",   # JS rendering
+        "premium": "false",
+        "country": "ar",
+    }
+    return requests.get(SCRAPINGDOG_URL, params=params, timeout=120)
+
+
 def fetch_page(url, retries=2):
     """Fetch a single page trying scrapers in priority order.
 
@@ -208,6 +265,14 @@ def fetch_page(url, retries=2):
         scrapers.append(("ZenRows-premium", lambda u: _zenrows_request(u, premium=True)))
     if CRAWLBASE_TOKEN:
         scrapers.append(("Crawlbase", lambda u: _crawlbase_request(u)))
+    if SCRAPFLY_API_KEY:
+        scrapers.append(("ScrapFly", lambda u: _scrapfly_request(u)))
+    if WEBSCRAPINGAPI_KEY:
+        scrapers.append(("WebScrapingAPI", lambda u: _webscrapingapi_request(u)))
+    if HASDATA_API_KEY:
+        scrapers.append(("HasData", lambda u: _hasdata_request(u)))
+    if SCRAPINGDOG_API_KEY:
+        scrapers.append(("ScrapingDog", lambda u: _scrapingdog_request(u)))
     if SCRAPERAPI_KEY:
         scrapers.append(("ScraperAPI", lambda u: _scraperapi_request(u)))
     # Always include direct request as last resort
@@ -1004,8 +1069,6 @@ def format_html_email(results_by_brand, summaries_by_brand=None):
         models = stats.get("models", {})
 
         total = stats.get("total", 0)
-        avgs = [m["avg"] for m in models.values() if m.get("avg")]
-        avg = f'${round(sum(avgs)/len(avgs)):,}'.replace(",", ".") if avgs else "—"
         n_up   = sum(m.get("n_up", 0)   for m in models.values())
         n_down = sum(m.get("n_down", 0) for m in models.values())
         n_new  = sum(m.get("n_new", 0)  for m in models.values())
@@ -1032,7 +1095,6 @@ def format_html_email(results_by_brand, summaries_by_brand=None):
             f'border-collapse:collapse;">'
             f'<tr>'
             + kpi_td("Total", total)
-            + kpi_td("Precio Prom.", avg)
             + kpi_td("↑ Subieron", n_up, "#ef4444")
             + kpi_td("↓ Bajaron",  n_down, "#22c55e")
             + kpi_td("★ Nuevas",   n_new, "#f97316")
@@ -1330,15 +1392,12 @@ function switchBrand(b) {
 /* --- KPIs --- */
 function renderKPIs(brand) {
   const models = brand.stats.models || {};
-  const avgs = Object.values(models).map(m => m.avg).filter(Boolean);
-  const globalAvg = avgs.length ? Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length) : 0;
   const nUp   = Object.values(models).reduce((s,m) => s+(m.n_up||0), 0);
   const nDown = Object.values(models).reduce((s,m) => s+(m.n_down||0), 0);
   const nNew  = Object.values(models).reduce((s,m) => s+(m.n_new||0), 0);
   const nModels = Object.keys(models).length;
   return '<div class="kpi-grid">' + [
     ['Publicaciones', fmtNum(brand.stats.total), nModels + ' modelos', ''],
-    ['Precio Promedio', globalAvg ? '$'+fmtNum(globalAvg) : '—', 'entre todos los modelos', ''],
     ['Subieron', '↑ '+nUp, 'vs. corrida anterior', 'kpi-up'],
     ['Bajaron',  '↓ '+nDown, 'vs. corrida anterior', 'kpi-down'],
     ['Nuevas',   nNew, 'publicaciones nuevas', 'kpi-new'],

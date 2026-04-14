@@ -49,6 +49,22 @@ ZENROWS_URL = "https://api.zenrows.com/v1/"
 CRAWLBASE_TOKEN = os.environ.get("CRAWLBASE_TOKEN", "")
 CRAWLBASE_URL = "https://api.crawlbase.com/"
 
+# --- ScrapFly ---
+SCRAPFLY_API_KEY = os.environ.get("SCRAPFLY_API_KEY", "")
+SCRAPFLY_URL = "https://api.scrapfly.io/scrape"
+
+# --- WebScrapingAPI ---
+WEBSCRAPINGAPI_KEY = os.environ.get("WEBSCRAPINGAPI_KEY", "")
+WEBSCRAPINGAPI_URL = "https://api.webscrapingapi.com/v2"
+
+# --- HasData ---
+HASDATA_API_KEY = os.environ.get("HASDATA_API_KEY", "")
+HASDATA_URL = "https://api.hasdata.com/scrape/chrome"
+
+# --- ScrapingDog ---
+SCRAPINGDOG_API_KEY = os.environ.get("SCRAPINGDOG_API_KEY", "")
+SCRAPINGDOG_URL = "https://api.scrapingdog.com/scrape"
+
 # --- Apify (fallback) ---
 APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", "")
 APIFY_ACTOR_ID = "karamelo~mercadolibre-scraper-espanol-castellano"
