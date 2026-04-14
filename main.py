@@ -302,14 +302,22 @@ def fetch_page(url, retries=2):
         lambda u: requests.get(u, headers=HEADERS, timeout=REQUEST_TIMEOUT),
     ))
 
+    # Markers that must appear in a valid MercadoLibre search results page.
+    # If none are present the scraper returned a captcha/redirect — try the next one.
+    RESULT_MARKERS = ("ui-search-layout", "andes-money-amount", "poly-card")
+
     last_exc = None
     for name, requester in scrapers:
         for attempt in range(1, retries + 1):
             try:
                 response = requester(url)
                 response.raise_for_status()
+                html = response.text
+                if not any(m in html for m in RESULT_MARKERS):
+                    print(f"  [{name}] OK pero sin contenido ML (captcha/redirect, {len(html)}B) — probando siguiente scraper...")
+                    break  # Try next scraper
                 print(f"  [{name}] OK")
-                return response.text
+                return html
             except requests.HTTPError as e:
                 last_exc = e
                 status = e.response.status_code if e.response is not None else 0
@@ -331,7 +339,9 @@ def fetch_page(url, retries=2):
                 else:
                     print(f"  [{name}] fallo definitivo: {e} — probando siguiente scraper...")
 
-    raise last_exc
+    if last_exc:
+        raise last_exc
+    raise requests.RequestException(f"Todos los scrapers fallaron para {url}")
 
 
 def _parse_price_from_card(card):
