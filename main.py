@@ -292,12 +292,22 @@ def parse_page(html):
     """
     listings = []
 
-    # Extract card boundaries by splitting on opening tags, then taking
-    # everything up to the next card start. This avoids the lazy .*?
-    # cutting at nested </li> tags inside the card.
+    # Extract card boundaries. Handle both single and double quotes on class=.
+    # [^>]* allows zero or more chars before 'class=' (covers <li class=... directly).
     card_starts = [m.start() for m in re.finditer(
-        r'<li[^>]+class="[^"]*ui-search-layout__item[^"]*"', html
+        r'<li[^>]*class=["\'][^"\']*ui-search-layout__item[^"\']*["\']', html
     )]
+
+    # Fallback: if no cards found with the primary regex, log context for diagnosis
+    if not card_starts:
+        idx = html.find('ui-search-layout__item')
+        if idx >= 0:
+            ctx_start = max(0, idx - 150)
+            print(f"  DEBUG: 'ui-search-layout__item' at {idx}, context: {repr(html[ctx_start:idx+100])}")
+        else:
+            print(f"  DEBUG: 'ui-search-layout__item' not found anywhere in HTML")
+
+    print(f"  DEBUG: card_starts count = {len(card_starts)}")
 
     cards = []
     for i, start in enumerate(card_starts):
@@ -305,10 +315,15 @@ def parse_page(html):
         cards.append(html[start:end])
 
     for card in cards:
-        # Extract item URL
+        # Extract item URL — handle both auto. and autos. domains, http/https
         url_match = re.search(
-            r'href="(https://auto\.mercadolibre\.com\.ar/MLA-[^"#]+)"', card
+            r'href="(https?://(?:auto|autos)\.mercadolibre\.com\.ar/MLA-[^"#]+)"', card
         )
+        if not url_match:
+            # Secondary: any mercadolibre.com.ar URL with MLA item code
+            url_match = re.search(
+                r'href="(https?://[^"]*mercadolibre\.com\.ar/[^"]*-MLA[^"#]+)"', card
+            )
         if not url_match:
             continue
 
@@ -536,6 +551,14 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
                 print(f"  DEBUG: Has 'ui-search-layout': {'ui-search-layout' in html}")
                 print(f"  DEBUG: Has 'poly-card': {'poly-card' in html}")
                 print(f"  DEBUG: Has 'andes-money-amount': {'andes-money-amount' in html}")
+                # Show sample of first <li> with ui-search-layout in it
+                li_idx = html.find('<li')
+                if li_idx >= 0:
+                    print(f"  DEBUG: First <li> tag: {repr(html[li_idx:li_idx+200])}")
+                # Show a snippet around the MLA url pattern to verify URL format
+                mla_idx = html.find('/MLA-')
+                if mla_idx >= 0:
+                    print(f"  DEBUG: MLA URL context: {repr(html[max(0,mla_idx-50):mla_idx+80])}")
             break
 
         all_listings.extend(listings)
