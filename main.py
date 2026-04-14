@@ -315,19 +315,20 @@ def parse_page(html):
         cards.append(html[start:end])
 
     for card in cards:
-        # Extract item URL — handle both auto. and autos. domains, http/https
+        # Extract item URL — MercadoLibre appends #polycard_client=... fragments,
+        # so we capture everything up to the closing quote, then strip the fragment.
         url_match = re.search(
-            r'href="(https?://(?:auto|autos)\.mercadolibre\.com\.ar/MLA-[^"#]+)"', card
+            r'href="(https?://(?:auto|autos)\.mercadolibre\.com\.ar/MLA-[^"]+)"', card
         )
         if not url_match:
             # Secondary: any mercadolibre.com.ar URL with MLA item code
             url_match = re.search(
-                r'href="(https?://[^"]*mercadolibre\.com\.ar/[^"]*-MLA[^"#]+)"', card
+                r'href="(https?://[^"]*mercadolibre\.com\.ar/[^"]*-MLA[^"]+)"', card
             )
         if not url_match:
             continue
 
-        item_url = url_match.group(1)
+        item_url = url_match.group(1).split('#')[0]  # strip #fragment tracking params
 
         # Extract title
         title_match = re.search(
