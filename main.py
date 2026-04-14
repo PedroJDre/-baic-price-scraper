@@ -194,17 +194,38 @@ def _crawlbase_request(url):
     return requests.get(CRAWLBASE_URL, params=params, timeout=120)
 
 
+class _FakeResponse:
+    """Minimal response shim to normalize APIs that return JSON wrappers."""
+    def __init__(self, text, status_code=200):
+        self.text = text
+        self.status_code = status_code
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            import requests as _r
+            raise _r.HTTPError(response=self)
+
+
 def _scrapfly_request(url):
-    """ScrapFly: JS rendering with anti-scraping bypass. ~1-10 credits/req."""
+    """ScrapFly: JS rendering with anti-scraping bypass. ~6 credits/req.
+
+    Response is JSON; actual HTML is at result.content.
+    """
     params = {
         "key": SCRAPFLY_API_KEY,
         "url": url,
         "render_js": "true",
-        "asp": "true",          # anti-scraping protection bypass
+        "asp": "true",
         "country": "AR",
         "wait": 5000,
+        "tags": "project:baic-scraper",
     }
-    return requests.get(SCRAPFLY_URL, params=params, timeout=120)
+    resp = requests.get(SCRAPFLY_URL, params=params, timeout=120)
+    resp.raise_for_status()
+    data = resp.json()
+    html = data.get("result", {}).get("content", "")
+    status = data.get("result", {}).get("status_code", 200)
+    return _FakeResponse(html, status)
 
 
 def _webscrapingapi_request(url):
