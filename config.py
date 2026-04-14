@@ -25,6 +25,14 @@ HISTORY_MAX_ENTRIES = 12  # ~6 weeks of data
 SCRAPERAPI_KEY = os.environ.get("SCRAPERAPI_KEY", "")
 SCRAPERAPI_URL = "https://api.scraperapi.com"
 
+# --- ScrapingBee ---
+SCRAPINGBEE_API_KEY = os.environ.get("SCRAPINGBEE_API_KEY", "")
+SCRAPINGBEE_URL = "https://app.scrapingbee.com/api/v1/"
+
+# --- ScrapingAnt ---
+SCRAPINGANT_API_KEY = os.environ.get("SCRAPINGANT_API_KEY", "")
+SCRAPINGANT_URL = "https://api.scrapingant.com/v2/general"
+
 # --- Apify (fallback) ---
 APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", "")
 APIFY_ACTOR_ID = "karamelo~mercadolibre-scraper-espanol-castellano"

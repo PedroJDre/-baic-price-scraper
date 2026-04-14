@@ -23,6 +23,10 @@ from config import (
     HEADERS,
     SCRAPERAPI_KEY,
     SCRAPERAPI_URL,
+    SCRAPINGBEE_API_KEY,
+    SCRAPINGBEE_URL,
+    SCRAPINGANT_API_KEY,
+    SCRAPINGANT_URL,
     APIFY_API_TOKEN,
     APIFY_ACTOR_ID,
     SMTP_SERVER,
@@ -111,35 +115,67 @@ def _scraperapi_request(url, use_wait_for_selector=True):
     return requests.get(api_url, timeout=REQUEST_TIMEOUT)
 
 
-def fetch_page(url, retries=3):
-    """Fetch a single page, using ScraperAPI if key is configured.
+def _scrapingbee_request(url):
+    """Make a single ScrapingBee request. Returns response object."""
+    params = {
+        "api_key": SCRAPINGBEE_API_KEY,
+        "url": url,
+        "render_js": "true",
+        "country_code": "ar",
+        "wait_for": "li.ui-search-layout__item",
+    }
+    return requests.get(SCRAPINGBEE_URL, params=params, timeout=REQUEST_TIMEOUT)
 
-    ScraperAPI requires render=true for MercadoLibre (JS-rendered content).
-    Tries with wait_for_selector first; if that fails with a server error,
-    falls back to a request without it.
+
+def _scrapingant_request(url):
+    """Make a single ScrapingAnt request. Returns response object."""
+    params = {
+        "x-api-key": SCRAPINGANT_API_KEY,
+        "url": url,
+        "browser": "true",
+        "wait_for_selector": "li.ui-search-layout__item",
+    }
+    return requests.get(SCRAPINGANT_URL, params=params, timeout=REQUEST_TIMEOUT)
+
+
+def fetch_page(url, retries=2):
+    """Fetch a single page trying scrapers in priority order.
+
+    Chain: ScraperAPI → ScrapingBee → ScrapingAnt → direct request
+    Each is skipped if its API key is not configured.
+    Falls back to Apify at a higher level if all return 0 listings.
     """
-    for attempt in range(1, retries + 1):
-        try:
-            if SCRAPERAPI_KEY:
-                try:
-                    response = _scraperapi_request(url, use_wait_for_selector=True)
-                    response.raise_for_status()
-                    return response.text
-                except requests.RequestException as e:
-                    print(f"  wait_for_selector fallo ({e}), reintentando sin el...")
-                    response = _scraperapi_request(url, use_wait_for_selector=False)
-                    response.raise_for_status()
-                    return response.text
-            else:
-                response = requests.get(url, headers=HEADERS, timeout=REQUEST_TIMEOUT)
+    scrapers = []
+    if SCRAPERAPI_KEY:
+        scrapers.append(("ScraperAPI", lambda u: _scraperapi_request(u)))
+    if SCRAPINGBEE_API_KEY:
+        scrapers.append(("ScrapingBee", lambda u: _scrapingbee_request(u)))
+    if SCRAPINGANT_API_KEY:
+        scrapers.append(("ScrapingAnt", lambda u: _scrapingant_request(u)))
+    # Always include direct request as last resort
+    scrapers.append((
+        "direct",
+        lambda u: requests.get(u, headers=HEADERS, timeout=REQUEST_TIMEOUT),
+    ))
+
+    last_exc = None
+    for name, requester in scrapers:
+        for attempt in range(1, retries + 1):
+            try:
+                response = requester(url)
                 response.raise_for_status()
+                print(f"  [{name}] OK")
                 return response.text
-        except requests.RequestException:
-            if attempt == retries:
-                raise
-            wait = attempt * 5
-            print(f"  Reintentando en {wait}s (intento {attempt}/{retries})...")
-            time.sleep(wait)
+            except requests.RequestException as e:
+                last_exc = e
+                if attempt < retries:
+                    wait = attempt * 5
+                    print(f"  [{name}] intento {attempt} fallo: {e} — reintentando en {wait}s...")
+                    time.sleep(wait)
+                else:
+                    print(f"  [{name}] fallo definitivo: {e} — probando siguiente scraper...")
+
+    raise last_exc
 
 
 def parse_page(html):
