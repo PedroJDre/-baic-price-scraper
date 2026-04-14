@@ -79,26 +79,7 @@ EMAIL_SUBJECT = "Reporte Diario Mercado Libre"
 
 # --- Brands to scrape ---
 BRANDS = {
-    "BAIC": {
-        "base_url": "https://autos.mercadolibre.com.ar/baic/",
-        "known_models": ["BJ30", "BJ40", "BJ60", "EU5", "U5", "X25", "X35", "X55"],
-        "apify_keywords": [
-            "Baic",
-            "Baic BJ30 2wd",
-            "Baic BJ30 4wd",
-            "Baic BJ40",
-            "Baic BJ60",
-            "Baic EU5",
-            "Baic U5",
-            "Baic X25",
-            "Baic X35",
-            "Baic X55",
-        ],
-        "prices_file": "data/prices_baic.json",
-        "min_listings_threshold": 200,
-        "header_color": "#0d47a1",
-        "card_color": "#1a237e",
-    },
+    # Chery first: fewer pages than BAIC, so it gets API credits before BAIC exhausts them
     "Chery": {
         "base_url": "https://autos.mercadolibre.com.ar/chery/",
         "known_models": [
@@ -119,5 +100,25 @@ BRANDS = {
         "min_listings_threshold": 100,
         "header_color": "#b71c1c",
         "card_color": "#7f0000",
+    },
+    "BAIC": {
+        "base_url": "https://autos.mercadolibre.com.ar/baic/",
+        "known_models": ["BJ30", "BJ40", "BJ60", "EU5", "U5", "X25", "X35", "X55"],
+        "apify_keywords": [
+            "Baic",
+            "Baic BJ30 2wd",
+            "Baic BJ30 4wd",
+            "Baic BJ40",
+            "Baic BJ60",
+            "Baic EU5",
+            "Baic U5",
+            "Baic X25",
+            "Baic X35",
+            "Baic X55",
+        ],
+        "prices_file": "data/prices_baic.json",
+        "min_listings_threshold": 200,
+        "header_color": "#0d47a1",
+        "card_color": "#1a237e",
     },
 }
