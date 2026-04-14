@@ -292,14 +292,17 @@ def parse_page(html):
     """
     listings = []
 
-    # Split on card openings — avoids lazy .* cutting at nested </li> tags
-    parts = re.split(r'(?=<li[^>]+class="[^"]*ui-search-layout__item)', html)
+    # Extract card boundaries by splitting on opening tags, then taking
+    # everything up to the next card start. This avoids the lazy .*?
+    # cutting at nested </li> tags inside the card.
+    card_starts = [m.start() for m in re.finditer(
+        r'<li[^>]+class="[^"]*ui-search-layout__item[^"]*"', html
+    )]
 
     cards = []
-    for part in parts:
-        if 'ui-search-layout__item' in part:
-            # Each part ends just before the next card — that's our card
-            cards.append(part)
+    for i, start in enumerate(card_starts):
+        end = card_starts[i + 1] if i + 1 < len(card_starts) else len(html)
+        cards.append(html[start:end])
 
     for card in cards:
         # Extract item URL
@@ -533,10 +536,6 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
                 print(f"  DEBUG: Has 'ui-search-layout': {'ui-search-layout' in html}")
                 print(f"  DEBUG: Has 'poly-card': {'poly-card' in html}")
                 print(f"  DEBUG: Has 'andes-money-amount': {'andes-money-amount' in html}")
-                # Show a snippet around any listing card
-                idx = html.find('ui-search-layout__item')
-                if idx > 0:
-                    print(f"  DEBUG HTML snippet:\n{html[idx:idx+800]}")
             break
 
         all_listings.extend(listings)
