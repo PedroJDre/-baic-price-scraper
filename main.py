@@ -1604,6 +1604,17 @@ def save_to_supabase(brand_name, grouped, items, run_date_str):
             })
 
     if listing_rows:
+        # Deduplicate by (run_date, url) before upserting — duplicates within
+        # the same batch cause a Postgres "cannot affect row a second time" error.
+        seen = set()
+        deduped = []
+        for row in listing_rows:
+            key = (row["run_date"], row["url"])
+            if key not in seen:
+                seen.add(key)
+                deduped.append(row)
+        listing_rows = deduped
+
         # Batch in chunks of 500 to stay within Supabase request limits
         chunk_size = 500
         for i in range(0, len(listing_rows), chunk_size):
