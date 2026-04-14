@@ -28,6 +28,10 @@ from config import (
     SCRAPINGBEE_URL,
     SCRAPINGANT_API_KEY,
     SCRAPINGANT_URL,
+    ZENROWS_API_KEY,
+    ZENROWS_URL,
+    CRAWLBASE_TOKEN,
+    CRAWLBASE_URL,
     APIFY_API_TOKEN,
     APIFY_ACTOR_ID,
     SMTP_SERVER,
@@ -121,15 +125,21 @@ def _scraperapi_request(url, use_wait_for_selector=True):
 
 
 def _scrapingbee_request(url):
-    """Make a single ScrapingBee request. Returns response object."""
+    """Make a single ScrapingBee request. Returns response object.
+
+    Uses wait (ms) instead of wait_for_selector — ScrapingBee's correct param.
+    premium_proxy=true helps bypass MercadoLibre antibot.
+    """
     params = {
         "api_key": SCRAPINGBEE_API_KEY,
         "url": url,
         "render_js": "true",
+        "premium_proxy": "true",
         "country_code": "ar",
-        "wait_for": "li.ui-search-layout__item",
+        "wait": "5000",  # wait 5s for JS to render
+        "block_ads": "true",
     }
-    return requests.get(SCRAPINGBEE_URL, params=params, timeout=REQUEST_TIMEOUT)
+    return requests.get(SCRAPINGBEE_URL, params=params, timeout=120)
 
 
 def _scrapingant_request(url):
@@ -138,25 +148,60 @@ def _scrapingant_request(url):
         "x-api-key": SCRAPINGANT_API_KEY,
         "url": url,
         "browser": "true",
-        "wait_for_selector": "li.ui-search-layout__item",
+        "wait": "5000",
+        "proxy_country": "AR",
     }
-    return requests.get(SCRAPINGANT_URL, params=params, timeout=REQUEST_TIMEOUT)
+    return requests.get(SCRAPINGANT_URL, params=params, timeout=120)
+
+
+def _zenrows_request(url):
+    """Make a single ZenRows request. Returns response object.
+
+    js_render + premium_proxy handles JS-heavy sites and antibot.
+    """
+    params = {
+        "apikey": ZENROWS_API_KEY,
+        "url": url,
+        "js_render": "true",
+        "premium_proxy": "true",
+        "proxy_country": "ar",
+        "wait": "5000",
+    }
+    return requests.get(ZENROWS_URL, params=params, timeout=120)
+
+
+def _crawlbase_request(url):
+    """Make a single Crawlbase request. Returns response object.
+
+    Uses JS token (not regular token) for JS-rendered pages.
+    """
+    params = {
+        "token": CRAWLBASE_TOKEN,
+        "url": url,
+        "country": "AR",
+        "wait": "5000",
+    }
+    return requests.get(CRAWLBASE_URL, params=params, timeout=120)
 
 
 def fetch_page(url, retries=2):
     """Fetch a single page trying scrapers in priority order.
 
-    Chain: ScraperAPI → ScrapingBee → ScrapingAnt → direct request
+    Chain: ScrapingBee → ScrapingAnt → ZenRows → Crawlbase → ScraperAPI → direct
     Each is skipped if its API key is not configured.
     Falls back to Apify at a higher level if all return 0 listings.
     """
     scrapers = []
-    if SCRAPERAPI_KEY:
-        scrapers.append(("ScraperAPI", lambda u: _scraperapi_request(u)))
     if SCRAPINGBEE_API_KEY:
         scrapers.append(("ScrapingBee", lambda u: _scrapingbee_request(u)))
     if SCRAPINGANT_API_KEY:
         scrapers.append(("ScrapingAnt", lambda u: _scrapingant_request(u)))
+    if ZENROWS_API_KEY:
+        scrapers.append(("ZenRows", lambda u: _zenrows_request(u)))
+    if CRAWLBASE_TOKEN:
+        scrapers.append(("Crawlbase", lambda u: _crawlbase_request(u)))
+    if SCRAPERAPI_KEY:
+        scrapers.append(("ScraperAPI", lambda u: _scraperapi_request(u)))
     # Always include direct request as last resort
     scrapers.append((
         "direct",

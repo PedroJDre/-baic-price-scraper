@@ -41,6 +41,14 @@ SCRAPINGBEE_URL = "https://app.scrapingbee.com/api/v1/"
 SCRAPINGANT_API_KEY = os.environ.get("SCRAPINGANT_API_KEY", "")
 SCRAPINGANT_URL = "https://api.scrapingant.com/v2/general"
 
+# --- ZenRows ---
+ZENROWS_API_KEY = os.environ.get("ZENROWS_API_KEY", "")
+ZENROWS_URL = "https://api.zenrows.com/v1/"
+
+# --- Crawlbase ---
+CRAWLBASE_TOKEN = os.environ.get("CRAWLBASE_TOKEN", "")
+CRAWLBASE_URL = "https://api.crawlbase.com/"
+
 # --- Apify (fallback) ---
 APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", "")
 APIFY_ACTOR_ID = "karamelo~mercadolibre-scraper-espanol-castellano"

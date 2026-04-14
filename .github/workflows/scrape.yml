@@ -33,6 +33,8 @@ jobs:
           SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
           SCRAPINGBEE_API_KEY: ${{ secrets.SCRAPINGBEE_API_KEY }}
           SCRAPINGANT_API_KEY: ${{ secrets.SCRAPINGANT_API_KEY }}
+          ZENROWS_API_KEY: ${{ secrets.ZENROWS_API_KEY }}
+          CRAWLBASE_TOKEN: ${{ secrets.CRAWLBASE_TOKEN }}
           APIFY_API_TOKEN: ${{ secrets.APIFY_API_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
