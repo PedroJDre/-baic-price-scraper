@@ -15,6 +15,10 @@ HEADERS = {
     "Accept-Language": "es-AR,es;q=0.9",
 }
 
+# --- Interactive report (GitHub Pages) ---
+REPORT_FILE = "docs/index.html"
+GITHUB_PAGES_URL = "https://pedrojdre.github.io/-baic-price-scraper/"
+
 # --- Claude API (executive summary) ---
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 ANTHROPIC_MODEL = "claude-haiku-4-5-20251001"

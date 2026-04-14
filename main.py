@@ -39,6 +39,8 @@ from config import (
     ANTHROPIC_MODEL,
     HISTORY_FILE,
     HISTORY_MAX_ENTRIES,
+    REPORT_FILE,
+    GITHUB_PAGES_URL,
 )
 
 
@@ -821,97 +823,106 @@ def _build_brand_html_section(brand_name, grouped, brand_config, summary=""):
 
 
 def format_html_email(results_by_brand, summaries_by_brand=None):
-    """Format all brands into a single styled HTML email (dashboard layout)."""
+    """Short briefing email with KPIs per brand and a CTA to the full interactive report."""
     summaries_by_brand = summaries_by_brand or {}
-    if not results_by_brand or not any(results_by_brand.values()):
-        return (
-            "<!DOCTYPE html><html><body>"
-            "<p>No se encontraron publicaciones en Mercado Libre.</p>"
-            "</body></html>"
-        )
-
     date_str = datetime.now().strftime('%d/%m/%Y %H:%M')
 
-    # Aggregate price changes across all brands
-    all_entries = [
-        e
-        for grouped in results_by_brand.values()
-        for entries in grouped.values()
-        for e in entries
-    ]
-    total_listings = len(all_entries)
-    n_up = sum(1 for e in all_entries if e.get("price_change") == "up")
-    n_down = sum(1 for e in all_entries if e.get("price_change") == "down")
-    n_new = sum(1 for e in all_entries if e.get("price_change") == "new")
-    n_same = sum(1 for e in all_entries if e.get("price_change") == "same")
-
-    changes_summary = ""
-    if n_up or n_down or n_new:
-        parts = []
-        if n_up:
-            parts.append(f'<span style="color:#c62828;font-weight:600;">\u2191 {n_up} subieron</span>')
-        if n_down:
-            parts.append(f'<span style="color:#2e7d32;font-weight:600;">\u2193 {n_down} bajaron</span>')
-        if n_same:
-            parts.append(f'<span style="color:#555;">= {n_same} sin cambio</span>')
-        if n_new:
-            parts.append(f'<span style="color:#ff6f00;font-weight:600;">{n_new} nuevas</span>')
-        changes_summary = (
-            '<tr><td style="padding:0 30px 16px;text-align:center;">'
-            '<div style="background-color:#f5f6fa;border-radius:8px;padding:10px 16px;font-size:13px;">'
-            f'{" &bull; ".join(parts)}'
-            '</div></td></tr>'
+    def kpi_td(label, value, color="#1a1a2e"):
+        return (
+            f'<td style="padding:10px 16px;text-align:center;border-right:1px solid #e2e8f0;">'
+            f'<div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;'
+            f'color:#94a3b8;font-weight:600;margin-bottom:4px;">{label}</div>'
+            f'<div style="font-size:20px;font-weight:700;color:{color};">{value}</div>'
+            f'</td>'
         )
 
-    # Build each brand's section
-    brand_sections = []
+    brand_blocks = []
     for brand_name, grouped in results_by_brand.items():
         brand_config = BRANDS.get(brand_name, {})
-        brand_sections.append(
-            _build_brand_html_section(
-                brand_name, grouped, brand_config,
-                summary=summaries_by_brand.get(brand_name, ""),
-            )
+        color = brand_config.get("header_color", "#0d47a1")
+        all_items = [e for entries in grouped.values() for e in entries]
+        stats = _compute_brand_stats(brand_name, grouped, all_items)
+        models = stats.get("models", {})
+
+        total = stats.get("total", 0)
+        avgs = [m["avg"] for m in models.values() if m.get("avg")]
+        avg = f'${round(sum(avgs)/len(avgs)):,}'.replace(",", ".") if avgs else "—"
+        n_up   = sum(m.get("n_up", 0)   for m in models.values())
+        n_down = sum(m.get("n_down", 0) for m in models.values())
+        n_new  = sum(m.get("n_new", 0)  for m in models.values())
+
+        summary = summaries_by_brand.get(brand_name, "")
+        summary_html = (
+            f'<tr><td style="padding:0 24px 18px;">'
+            f'<div style="background:#fffde7;border-left:4px solid {color};'
+            f'padding:12px 16px;border-radius:0 6px 6px 0;font-size:13px;'
+            f'line-height:1.7;color:#374151;font-style:italic;">{summary}</div>'
+            f'</td></tr>'
+        ) if summary else ""
+
+        brand_blocks.append(
+            f'<tr><td style="padding:20px 24px 4px;">'
+            f'<div style="background:{color};border-radius:10px 10px 0 0;'
+            f'padding:14px 20px;color:#fff;">'
+            f'<span style="font-size:18px;font-weight:700;">{brand_name}</span>'
+            f'<span style="font-size:12px;opacity:.8;margin-left:10px;">'
+            f'{total} publicaciones &bull; {len(models)} modelos</span>'
+            f'</div>'
+            f'<table width="100%" cellpadding="0" cellspacing="0" '
+            f'style="border:1px solid #e2e8f0;border-top:none;border-radius:0 0 10px 10px;'
+            f'border-collapse:collapse;">'
+            f'<tr>'
+            + kpi_td("Total", total)
+            + kpi_td("Precio Prom.", avg)
+            + kpi_td("↑ Subieron", n_up, "#ef4444")
+            + kpi_td("↓ Bajaron",  n_down, "#22c55e")
+            + kpi_td("★ Nuevas",   n_new, "#f97316")
+            + f'</tr></table></td></tr>'
+            + summary_html
         )
-    # Separate brands with a horizontal divider
-    brands_html = '<hr style="border:none;border-top:2px solid #e0e3eb;margin:32px 0;">'.join(
-        brand_sections
+
+    brands_html = "".join(brand_blocks)
+
+    cta = (
+        f'<tr><td style="padding:24px 24px 28px;text-align:center;">'
+        f'<a href="{GITHUB_PAGES_URL}" target="_blank" '
+        f'style="display:inline-block;background:#1a1a2e;color:#fff;'
+        f'padding:14px 36px;border-radius:8px;font-size:15px;font-weight:700;'
+        f'text-decoration:none;letter-spacing:.3px;">'
+        f'Ver reporte interactivo completo &rarr;</a>'
+        f'<p style="margin:10px 0 0;font-size:11px;color:#94a3b8;">'
+        f'Con filtros, ordenamiento, gr&aacute;ficos de tendencia y m&aacute;s</p>'
+        f'</td></tr>'
     )
 
     return (
-        '<!DOCTYPE html>'
-        '<html lang="es"><head><meta charset="utf-8">'
-        '<meta name="viewport" content="width=device-width,initial-scale=1.0">'
-        '</head>'
-        '<body style="margin:0;padding:0;background-color:#eef1f7;'
-        '-webkit-font-smoothing:antialiased;">'
-        '<table width="100%" cellpadding="0" cellspacing="0" '
-        'style="background-color:#eef1f7;padding:24px 0;">'
-        '<tr><td align="center">'
-        '<table width="720" cellpadding="0" cellspacing="0" '
-        'style="background-color:#ffffff;border-radius:12px;overflow:hidden;'
-        'box-shadow:0 2px 12px rgba(0,0,0,0.08);'
+        '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1.0"></head>'
+        '<body style="margin:0;padding:0;background:#eef1f7;'
         'font-family:\'Segoe UI\',Arial,Helvetica,sans-serif;">'
-        # HEADER
-        '<tr><td style="background-color:#212121;padding:28px 30px 20px;text-align:center;">'
-        '<h1 style="margin:0;font-size:24px;color:#ffffff;font-weight:700;letter-spacing:0.3px;">'
-        'Reporte de Precios &mdash; Mercado Libre Argentina</h1>'
-        f'<p style="margin:8px 0 0;font-size:13px;color:rgba(255,255,255,0.75);">'
-        f'Generado el {date_str} &bull; {total_listings} publicaciones totales</p>'
+        '<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef1f7;padding:24px 0;">'
+        '<tr><td align="center">'
+        '<table width="620" cellpadding="0" cellspacing="0" '
+        'style="background:#fff;border-radius:12px;overflow:hidden;'
+        'box-shadow:0 2px 12px rgba(0,0,0,.08);">'
+        # Header
+        '<tr><td style="background:#1a1a2e;padding:26px 28px;text-align:center;">'
+        '<h1 style="margin:0;font-size:22px;color:#fff;font-weight:700;">'
+        'Reporte ML Argentina</h1>'
+        f'<p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,.65);">'
+        f'Generado el {date_str}</p>'
         '</td></tr>'
-        # PRICE CHANGES SUMMARY
-        f'{changes_summary}'
-        # BRAND SECTIONS
-        f'<tr><td style="padding:24px 24px 8px;">{brands_html}</td></tr>'
-        # FOOTER
-        '<tr><td style="background-color:#f5f6fa;padding:20px 30px;text-align:center;'
-        'border-top:1px solid #e0e3eb;">'
-        '<p style="margin:0;font-size:12px;color:#90949e;">'
+        # Brand KPI blocks
+        f'{brands_html}'
+        # CTA
+        f'{cta}'
+        # Footer
+        '<tr><td style="background:#f8fafc;padding:16px 24px;text-align:center;'
+        'border-top:1px solid #e2e8f0;">'
+        '<p style="margin:0;font-size:11px;color:#94a3b8;">'
         'Datos obtenidos de Mercado Libre Argentina &bull; Precios sujetos a cambio</p>'
         '</td></tr>'
-        '</table>'
-        '</td></tr></table>'
-        '</body></html>'
+        '</table></td></tr></table></body></html>'
     )
 
 
@@ -1037,6 +1048,381 @@ def generate_brand_summary(brand_name, grouped, items, history):
         return ""
 
 
+_REPORT_TEMPLATE = """\
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reporte ML Argentina</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--brand:#0d47a1}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+/* --- Nav --- */
+.topbar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:12px;padding:0 24px;height:56px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.topbar-logo{font-weight:700;font-size:15px;color:#1a1a2e;letter-spacing:-.3px;white-space:nowrap}
+.topbar-date{font-size:11px;color:#94a3b8;margin-left:auto;white-space:nowrap}
+.brand-tabs{display:flex;gap:4px}
+.brand-tab{border:none;background:#f1f5f9;padding:6px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;color:#64748b;transition:all .15s}
+.brand-tab.active{background:var(--brand);color:#fff}
+/* --- Layout --- */
+.main{max-width:1200px;margin:0 auto;padding:20px 16px}
+/* --- KPI cards --- */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.kpi-card{background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;font-weight:600;margin-bottom:6px}
+.kpi-value{font-size:24px;font-weight:700;color:#1a1a2e;letter-spacing:-.5px;line-height:1}
+.kpi-sub{font-size:11px;color:#94a3b8;margin-top:5px}
+.kpi-up{color:#ef4444}.kpi-down{color:#22c55e}.kpi-new{color:#f97316}
+/* --- Summary --- */
+.summary-card{background:#fff;border-radius:12px;padding:18px 22px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid var(--brand)}
+.card-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;font-weight:600;margin-bottom:10px}
+.summary-text{font-size:13.5px;line-height:1.8;color:#374151;font-style:italic}
+/* --- Chart --- */
+.chart-card{background:#fff;border-radius:12px;padding:18px 22px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+.chart-title{font-size:13px;font-weight:600;color:#374151}
+.chart-model-select{border:1px solid #e2e8f0;border-radius:8px;padding:5px 12px;font-size:12px;color:#374151;background:#fff;cursor:pointer;outline:none}
+.chart-wrap{position:relative;height:200px}
+/* --- Controls --- */
+.controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;color:#374151;outline:none;transition:border .15s}
+.search-input:focus{border-color:var(--brand)}
+.ctrl-select{border:1px solid #e2e8f0;border-radius:8px;padding:8px 14px;font-size:13px;color:#374151;background:#fff;cursor:pointer;outline:none}
+/* --- Table --- */
+.table-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:20px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:#f8fafc;padding:10px 14px;text-align:left;font-weight:600;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0;cursor:pointer;user-select:none;white-space:nowrap}
+thead th:hover{background:#f1f5f9}
+thead th.sort-asc::after{content:' ↑'}
+thead th.sort-desc::after{content:' ↓'}
+tbody tr:hover{background:#f8fafc}
+tbody td{padding:10px 14px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.badge-model{display:inline-block;background:#e0e7ff;color:#3730a3;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.badge-new{display:inline-block;background:#f97316;color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;margin-left:5px;vertical-align:middle}
+.price-cell{font-weight:700;color:#15803d;white-space:nowrap}
+.price-delta{font-size:11px;font-weight:600;display:block}
+.price-delta.up{color:#ef4444}.price-delta.down{color:#22c55e}
+.btn-ver{display:inline-block;background:var(--brand);color:#fff;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;transition:opacity .15s}
+.btn-ver:hover{opacity:.8}
+.row-count{font-size:12px;color:#94a3b8;padding:10px 14px 4px;text-align:right}
+/* --- Pagination --- */
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px}
+.page-btn{border:1px solid #e2e8f0;background:#fff;border-radius:8px;padding:5px 11px;font-size:13px;cursor:pointer;color:#374151;transition:all .15s}
+.page-btn:hover:not(:disabled){border-color:var(--brand);color:var(--brand)}
+.page-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.page-btn:disabled{opacity:.35;cursor:not-allowed}
+/* --- Footer --- */
+.footer{text-align:center;padding:24px;font-size:11px;color:#94a3b8}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <span class="topbar-logo">📊 Precios ML Argentina</span>
+  <div class="brand-tabs" id="brandTabs"></div>
+  <span class="topbar-date">Actualizado: __DATE__</span>
+</nav>
+<main class="main" id="app"></main>
+<footer class="footer">Datos obtenidos de Mercado Libre Argentina &bull; Precios sujetos a cambio</footer>
+
+<script>
+const DATA = __BRANDS_JSON__;
+const HISTORY = __HIST_JSON__;
+const PAGE_SIZE = 50;
+
+let state = {
+  brand: Object.keys(DATA)[0],
+  search: '',
+  model: '',
+  sort: 'price',
+  sortDir: 'asc',
+  page: 1,
+  chart: null,
+};
+
+/* --- Helpers --- */
+function fmtPrice(item) {
+  if (!item.price) return '—';
+  const n = item.price.toLocaleString('es-AR');
+  return (item.currency === 'U$S' || item.currency === 'US$') ? 'USD ' + n : '$' + n;
+}
+function fmtNum(n) { return n ? n.toLocaleString('es-AR') : '0'; }
+
+/* --- Tabs --- */
+function renderTabs() {
+  document.getElementById('brandTabs').innerHTML = Object.keys(DATA).map(b => {
+    const active = b === state.brand;
+    const style = active ? 'style="background:' + DATA[b].color + ';color:#fff"' : '';
+    return '<button class="brand-tab ' + (active?'active':'') + '" ' + style + ' onclick="switchBrand(\'' + b + '\')">' + b + '</button>';
+  }).join('');
+}
+
+function switchBrand(b) {
+  state = { ...state, brand: b, model: '', search: '', page: 1, chart: null };
+  document.documentElement.style.setProperty('--brand', DATA[b].color);
+  renderTabs();
+  renderApp();
+}
+
+/* --- KPIs --- */
+function renderKPIs(brand) {
+  const models = brand.stats.models || {};
+  const avgs = Object.values(models).map(m => m.avg).filter(Boolean);
+  const globalAvg = avgs.length ? Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length) : 0;
+  const nUp   = Object.values(models).reduce((s,m) => s+(m.n_up||0), 0);
+  const nDown = Object.values(models).reduce((s,m) => s+(m.n_down||0), 0);
+  const nNew  = Object.values(models).reduce((s,m) => s+(m.n_new||0), 0);
+  const nModels = Object.keys(models).length;
+  return '<div class="kpi-grid">' + [
+    ['Publicaciones', fmtNum(brand.stats.total), nModels + ' modelos', ''],
+    ['Precio Promedio', globalAvg ? '$'+fmtNum(globalAvg) : '—', 'entre todos los modelos', ''],
+    ['Subieron', '↑ '+nUp, 'vs. corrida anterior', 'kpi-up'],
+    ['Bajaron',  '↓ '+nDown, 'vs. corrida anterior', 'kpi-down'],
+    ['Nuevas',   nNew, 'publicaciones nuevas', 'kpi-new'],
+  ].map(([label, val, sub, cls]) =>
+    '<div class="kpi-card"><div class="kpi-label">'+label+'</div>' +
+    '<div class="kpi-value '+cls+'">'+val+'</div>' +
+    '<div class="kpi-sub">'+sub+'</div></div>'
+  ).join('') + '</div>';
+}
+
+/* --- Summary --- */
+function renderSummary(brand) {
+  if (!brand.summary) return '';
+  return '<div class="summary-card"><div class="card-label">🤖 Resumen Ejecutivo</div>' +
+    '<div class="summary-text">' + brand.summary + '</div></div>';
+}
+
+/* --- Chart --- */
+function renderChart(brandName) {
+  const hist = HISTORY[brandName] || {};
+  const models = Object.keys(hist);
+  if (!models.length) return '';
+  const opts = models.map(m => '<option value="'+m+'">'+m+'</option>').join('');
+  return '<div class="chart-card"><div class="chart-header">' +
+    '<span class="chart-title">Evolución de Precio Promedio</span>' +
+    '<select class="chart-model-select" id="chartModelSel" onchange="updateChart()">' + opts + '</select>' +
+    '</div><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>';
+}
+
+function updateChart() {
+  const hist = HISTORY[state.brand] || {};
+  const sel = document.getElementById('chartModelSel');
+  if (!sel) return;
+  const data = hist[sel.value] || [];
+  if (state.chart) { state.chart.destroy(); state.chart = null; }
+  const ctx = document.getElementById('trendChart');
+  if (!ctx || !data.length) return;
+  const color = DATA[state.brand].color;
+  state.chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(d => d.date),
+      datasets: [{
+        label: sel.value,
+        data: data.map(d => d.avg),
+        borderColor: color,
+        backgroundColor: color + '18',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        pointBackgroundColor: color,
+        fill: true,
+        tension: 0.35,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString('es-AR') }
+      }},
+      scales: {
+        y: { ticks: { callback: v => '$' + (v/1e6).toFixed(1)+'M', font:{size:11} }, grid:{color:'#f1f5f9'} },
+        x: { ticks: { font:{size:11} }, grid:{display:false} }
+      }
+    }
+  });
+}
+
+/* --- Table --- */
+function getFilteredItems() {
+  let items = (DATA[state.brand].items || []).slice();
+  if (state.model) items = items.filter(i => i.model === state.model);
+  if (state.search) {
+    const q = state.search.toLowerCase();
+    items = items.filter(i =>
+      i.variant.toLowerCase().includes(q) ||
+      i.seller.toLowerCase().includes(q) ||
+      i.location.toLowerCase().includes(q)
+    );
+  }
+  items.sort((a, b) => {
+    let va = a[state.sort], vb = b[state.sort];
+    if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+    if (va < vb) return state.sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return state.sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return items;
+}
+
+function sortBy(field) {
+  if (state.sort === field) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+  else { state.sort = field; state.sortDir = 'asc'; }
+  state.page = 1;
+  renderTable();
+}
+
+function renderTableSection() {
+  const allModels = [...new Set((DATA[state.brand].items||[]).map(i=>i.model))].sort();
+  const modelOpts = '<option value="">Todos los modelos</option>' +
+    allModels.map(m => '<option value="'+m+'"'+(m===state.model?' selected':'')+'>'+m+'</option>').join('');
+  return '<div class="controls">' +
+    '<input class="search-input" type="text" placeholder="🔍 Buscar variante, vendedor, ubicación..." ' +
+    'value="'+state.search.replace(/"/g,'&quot;')+'" oninput="onSearch(this.value)">' +
+    '<select class="ctrl-select" onchange="onModel(this.value)">'+modelOpts+'</select>' +
+    '</div>' +
+    '<div class="table-card"><div class="table-wrap" id="tableWrap"></div>' +
+    '<div class="pagination" id="pagination"></div></div>';
+}
+
+function renderTable() {
+  const items = getFilteredItems();
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  if (state.page > totalPages) state.page = totalPages;
+  const page = items.slice((state.page-1)*PAGE_SIZE, state.page*PAGE_SIZE);
+
+  function th(field, label) {
+    const cls = state.sort===field ? 'sort-'+state.sortDir : '';
+    return '<th class="'+cls+'" onclick="sortBy(\''+field+'\')">'+label+'</th>';
+  }
+
+  const rows = page.map(item => {
+    let delta = '';
+    if (item.price_change === 'up' && item.price_diff)
+      delta = '<span class="price-delta up">↑ +'+fmtNum(item.price_diff)+'</span>';
+    else if (item.price_change === 'down' && item.price_diff)
+      delta = '<span class="price-delta down">↓ -'+fmtNum(item.price_diff)+'</span>';
+    const newBadge = item.price_change === 'new' ? '<span class="badge-new">NUEVA</span>' : '';
+    const seller = item.seller !== 'N/A' ? item.seller : '<span style="color:#ccc">—</span>';
+    const loc    = item.location || '<span style="color:#ccc">—</span>';
+    return '<tr>' +
+      '<td><span class="badge-model">'+item.model+'</span></td>' +
+      '<td>'+item.variant+newBadge+'</td>' +
+      '<td>'+seller+'</td>' +
+      '<td class="price-cell">'+fmtPrice(item)+delta+'</td>' +
+      '<td style="color:#64748b">'+loc+'</td>' +
+      '<td><a class="btn-ver" href="'+item.url+'" target="_blank">Ver →</a></td>' +
+      '</tr>';
+  }).join('');
+
+  const wrap = document.getElementById('tableWrap');
+  if (wrap) wrap.innerHTML =
+    '<div class="row-count">'+items.length+' publicaciones</div>' +
+    '<table><thead><tr>' +
+    th('model','Modelo') + th('variant','Variante') + th('seller','Vendedor') +
+    th('price','Precio') + th('location','Ubicación') + '<th>Link</th>' +
+    '</tr></thead><tbody>'+rows+'</tbody></table>';
+
+  const pag = document.getElementById('pagination');
+  if (!pag) return;
+  if (totalPages <= 1) { pag.innerHTML = ''; return; }
+  let btns = '<button class="page-btn" onclick="goto('+(state.page-1)+')" '+(state.page===1?'disabled':'')+'>&#8249;</button>';
+  for (let p=1;p<=totalPages;p++) {
+    if (p===1||p===totalPages||Math.abs(p-state.page)<=2)
+      btns += '<button class="page-btn'+(p===state.page?' active':'')+'" onclick="goto('+p+')">'+p+'</button>';
+    else if (Math.abs(p-state.page)===3)
+      btns += '<span style="color:#ccc;padding:0 4px">&hellip;</span>';
+  }
+  btns += '<button class="page-btn" onclick="goto('+(state.page+1)+')" '+(state.page===totalPages?'disabled':'')+'>&#8250;</button>';
+  pag.innerHTML = btns;
+}
+
+function onSearch(v) { state.search = v; state.page = 1; renderTable(); }
+function onModel(v)  { state.model  = v; state.page = 1; renderTable(); }
+function goto(p)     { state.page   = p; renderTable(); window.scrollTo(0,0); }
+
+/* --- Boot --- */
+function renderApp() {
+  const brand = DATA[state.brand];
+  document.getElementById('app').innerHTML =
+    renderKPIs(brand) + renderSummary(brand) + renderChart(state.brand) + renderTableSection();
+  renderTable();
+  setTimeout(updateChart, 50);
+}
+
+document.documentElement.style.setProperty('--brand', DATA[state.brand].color);
+renderTabs();
+renderApp();
+</script>
+</body>
+</html>
+"""
+
+
+def generate_interactive_report(results_by_brand, summaries_by_brand, history):
+    """Generate a self-contained interactive HTML dashboard and save it to docs/index.html."""
+    date_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+
+    # Build brands payload
+    brands_payload = {}
+    for brand_name, grouped in results_by_brand.items():
+        brand_config = BRANDS.get(brand_name, {})
+        all_items = [e for entries in grouped.values() for e in entries]
+        items = []
+        for model, entries in grouped.items():
+            for e in entries:
+                variant = _strip_model_prefix(e.get("title", ""), model, brand_name)
+                items.append({
+                    "model": model,
+                    "variant": variant,
+                    "subcategory": e.get("subcategory", "Otros"),
+                    "seller": e.get("seller", "N/A"),
+                    "price": e.get("price", 0),
+                    "currency": e.get("currency", "$"),
+                    "price_change": e.get("price_change", "new"),
+                    "price_diff": e.get("price_diff", 0),
+                    "anticipo": e.get("anticipo", 0),
+                    "location": e.get("location", ""),
+                    "url": e.get("url", ""),
+                })
+        brands_payload[brand_name] = {
+            "color": brand_config.get("header_color", "#0d47a1"),
+            "items": items,
+            "stats": _compute_brand_stats(brand_name, grouped, all_items),
+            "summary": summaries_by_brand.get(brand_name, ""),
+        }
+
+    # Build history payload: {brand: {model: [{date, avg, count}]}}
+    hist_payload = {}
+    for date, brands in sorted(history.items()):
+        for brand_name, bstats in brands.items():
+            hist_payload.setdefault(brand_name, {})
+            for model, mstats in bstats.get("models", {}).items():
+                hist_payload[brand_name].setdefault(model, []).append({
+                    "date": date,
+                    "avg": mstats.get("avg", 0),
+                    "count": mstats.get("count", 0),
+                })
+
+    html = (
+        _REPORT_TEMPLATE
+        .replace("__DATE__", date_str)
+        .replace("__BRANDS_JSON__", json.dumps(brands_payload, ensure_ascii=False))
+        .replace("__HIST_JSON__", json.dumps(hist_payload, ensure_ascii=False))
+    )
+
+    report_path = os.path.join(os.path.dirname(__file__), REPORT_FILE)
+    os.makedirs(os.path.dirname(report_path), exist_ok=True)
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"Reporte interactivo guardado en {report_path}")
+
+
 def send_email(subject, plain_body, html_body):
     """Send the email via Gmail SMTP with HTML + plain text fallback."""
     if not EMAIL_SENDER or not EMAIL_PASSWORD:
@@ -1136,6 +1522,7 @@ def main():
         save_current_prices(data["items"], data["prices_file"])
 
     save_history(history)
+    generate_interactive_report(results_by_brand, summaries_by_brand, history)
     print("Listo.")
 
 
