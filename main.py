@@ -154,19 +154,21 @@ def _scrapingant_request(url):
     return requests.get(SCRAPINGANT_URL, params=params, timeout=120)
 
 
-def _zenrows_request(url):
+def _zenrows_request(url, premium=False):
     """Make a single ZenRows request. Returns response object.
 
-    js_render + premium_proxy handles JS-heavy sites and antibot.
+    Without premium_proxy costs ~5 credits; with premium costs ~15.
+    Try without premium first to conserve credits.
     """
     params = {
         "apikey": ZENROWS_API_KEY,
         "url": url,
         "js_render": "true",
-        "premium_proxy": "true",
         "proxy_country": "ar",
         "wait": "5000",
     }
+    if premium:
+        params["premium_proxy"] = "true"
     return requests.get(ZENROWS_URL, params=params, timeout=120)
 
 
@@ -187,17 +189,23 @@ def _crawlbase_request(url):
 def fetch_page(url, retries=2):
     """Fetch a single page trying scrapers in priority order.
 
-    Chain: ScrapingBee → ScrapingAnt → ZenRows → Crawlbase → ScraperAPI → direct
+    Chain: ScrapingBee → ScrapingAnt → ZenRows (standard) →
+           ZenRows (premium) → Crawlbase → ScraperAPI → direct
     Each is skipped if its API key is not configured.
-    Falls back to Apify at a higher level if all return 0 listings.
+    4xx auth/credit errors skip retries immediately — retrying won't help.
     """
+    # Status codes that indicate a credential/credit problem — never retry these.
+    NO_RETRY_CODES = {401, 402, 403, 422, 429}
+
     scrapers = []
     if SCRAPINGBEE_API_KEY:
         scrapers.append(("ScrapingBee", lambda u: _scrapingbee_request(u)))
     if SCRAPINGANT_API_KEY:
         scrapers.append(("ScrapingAnt", lambda u: _scrapingant_request(u)))
     if ZENROWS_API_KEY:
-        scrapers.append(("ZenRows", lambda u: _zenrows_request(u)))
+        # Try standard first (cheaper), then premium (more reliable but costs 3x)
+        scrapers.append(("ZenRows", lambda u: _zenrows_request(u, premium=False)))
+        scrapers.append(("ZenRows-premium", lambda u: _zenrows_request(u, premium=True)))
     if CRAWLBASE_TOKEN:
         scrapers.append(("Crawlbase", lambda u: _crawlbase_request(u)))
     if SCRAPERAPI_KEY:
@@ -216,6 +224,18 @@ def fetch_page(url, retries=2):
                 response.raise_for_status()
                 print(f"  [{name}] OK")
                 return response.text
+            except requests.HTTPError as e:
+                last_exc = e
+                status = e.response.status_code if e.response is not None else 0
+                if status in NO_RETRY_CODES:
+                    print(f"  [{name}] {status} — sin creditos/auth, saltando...")
+                    break  # Skip retries, move to next scraper immediately
+                if attempt < retries:
+                    wait = attempt * 5
+                    print(f"  [{name}] intento {attempt} fallo: {e} — reintentando en {wait}s...")
+                    time.sleep(wait)
+                else:
+                    print(f"  [{name}] fallo definitivo: {e} — probando siguiente scraper...")
             except requests.RequestException as e:
                 last_exc = e
                 if attempt < retries:
