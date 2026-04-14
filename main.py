@@ -532,6 +532,11 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
                 print(f"  DEBUG: HTML length = {len(html)}")
                 print(f"  DEBUG: Has 'ui-search-layout': {'ui-search-layout' in html}")
                 print(f"  DEBUG: Has 'poly-card': {'poly-card' in html}")
+                print(f"  DEBUG: Has 'andes-money-amount': {'andes-money-amount' in html}")
+                # Show a snippet around any listing card
+                idx = html.find('ui-search-layout__item')
+                if idx > 0:
+                    print(f"  DEBUG HTML snippet:\n{html[idx:idx+800]}")
             break
 
         all_listings.extend(listings)
