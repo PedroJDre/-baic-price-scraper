@@ -1790,6 +1790,81 @@ def send_email(subject, plain_body, html_body):
     print(f"Email enviado a: {', '.join(recipients)}")
 
 
+def _load_today_from_supabase(brand_name, run_date_str):
+    """Load today's already-scraped listings from Supabase.
+
+    Returns (grouped, items) if a completed run exists for today,
+    or (None, None) if no data found or Supabase is not configured.
+    """
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return None, None
+    try:
+        client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        # Check if a run record already exists for today with actual data
+        run_check = (
+            client.table("runs")
+            .select("total")
+            .eq("run_date", run_date_str)
+            .eq("brand", brand_name)
+            .execute()
+        )
+        if not run_check.data or run_check.data[0]["total"] == 0:
+            return None, None
+
+        total_in_db = run_check.data[0]["total"]
+
+        # Load all listings for today — paginate in case > 1000 rows
+        all_rows = []
+        page_size = 1000
+        offset = 0
+        while True:
+            batch = (
+                client.table("listings")
+                .select("*")
+                .eq("run_date", run_date_str)
+                .eq("brand", brand_name)
+                .range(offset, offset + page_size - 1)
+                .execute()
+            )
+            all_rows.extend(batch.data)
+            if len(batch.data) < page_size:
+                break
+            offset += page_size
+
+        if not all_rows:
+            return None, None
+
+        # Reconstruct items list and grouped dict from DB rows
+        items = []
+        grouped = {}
+        for row in all_rows:
+            model = row.get("model", "Otros")
+            item = {
+                "title": f"{brand_name} {model} {row.get('variant', '')}".strip(),
+                "seller":       row.get("seller", "Particular"),
+                "price":        row.get("price", 0),
+                "anticipo":     row.get("anticipo", 0),
+                "currency":     row.get("currency", "$"),
+                "location":     row.get("location", ""),
+                "url":          row.get("url", ""),
+                "price_change": row.get("price_change", "same"),
+                "price_diff":   row.get("price_diff", 0),
+                "subcategory":  row.get("subcategory", "Otros"),
+            }
+            items.append(item)
+            grouped.setdefault(model, []).append(item)
+
+        print(
+            f"[{brand_name}] Datos de hoy encontrados en Supabase "
+            f"({len(all_rows)}/{total_in_db} publicaciones) — omitiendo scraping."
+        )
+        return grouped, items
+
+    except Exception as e:
+        print(f"[{brand_name}] No se pudo cargar desde Supabase: {e}")
+        return None, None
+
+
 def main():
     print(f"Iniciando scraper - {datetime.now()}")
 
@@ -1802,39 +1877,46 @@ def main():
         print(f"Procesando: {brand_name}")
         print(f"{'=' * 50}")
 
-        try:
-            items = fetch_all_listings(
-                brand_name,
-                brand_config["base_url"],
-                brand_config["apify_keywords"],
-                brand_config.get("min_listings_threshold", 200),
+        # --- Check if today's data is already in Supabase ---
+        grouped, items = _load_today_from_supabase(brand_name, today)
+        scraped_fresh = grouped is None
+
+        if scraped_fresh:
+            # No DB data for today — scrape fresh
+            try:
+                items = fetch_all_listings(
+                    brand_name,
+                    brand_config["base_url"],
+                    brand_config["apify_keywords"],
+                    brand_config.get("min_listings_threshold", 200),
+                )
+            except Exception as e:
+                print(f"ERROR al obtener publicaciones de {brand_name}: {e}")
+                items = []
+
+            previous_prices = load_previous_prices(brand_config["prices_file"])
+            compute_price_changes(items, previous_prices)
+
+            n_up = sum(1 for i in items if i.get("price_change") == "up")
+            n_down = sum(1 for i in items if i.get("price_change") == "down")
+            n_new = sum(1 for i in items if i.get("price_change") == "new")
+            n_same = sum(1 for i in items if i.get("price_change") == "same")
+            print(
+                f"[{brand_name}] Cambios: {n_up} subieron, {n_down} bajaron, "
+                f"{n_same} sin cambio, {n_new} nuevas"
             )
-        except Exception as e:
-            print(f"ERROR al obtener publicaciones de {brand_name}: {e}")
-            items = []
 
-        previous_prices = load_previous_prices(brand_config["prices_file"])
-        compute_price_changes(items, previous_prices)
-
-        n_up = sum(1 for i in items if i.get("price_change") == "up")
-        n_down = sum(1 for i in items if i.get("price_change") == "down")
-        n_new = sum(1 for i in items if i.get("price_change") == "new")
-        n_same = sum(1 for i in items if i.get("price_change") == "same")
-        print(
-            f"[{brand_name}] Cambios: {n_up} subieron, {n_down} bajaron, "
-            f"{n_same} sin cambio, {n_new} nuevas"
-        )
-
-        grouped = process_listings(items, brand_config["known_models"], brand_name)
+            grouped = process_listings(items, brand_config["known_models"], brand_name)
 
         # Accumulate stats into history
         stats = _compute_brand_stats(brand_name, grouped, items)
         update_history(history, today, brand_name, stats)
 
         all_results[brand_name] = {
-            "grouped": grouped,
-            "items": items,
-            "prices_file": brand_config["prices_file"],
+            "grouped":      grouped,
+            "items":        items,
+            "prices_file":  brand_config["prices_file"],
+            "scraped_fresh": scraped_fresh,
         }
 
     # Generate executive summaries via Claude Haiku
@@ -1860,13 +1942,17 @@ def main():
         sys.exit(1)
 
     for brand_name, data in all_results.items():
-        save_current_prices(data["items"], data["prices_file"])
-        try:
-            save_to_supabase(
-                brand_name, data["grouped"], data["items"], today
-            )
-        except Exception as e:
-            print(f"[{brand_name}] ERROR al guardar en Supabase: {e}")
+        if data["scraped_fresh"]:
+            # Only save to disk/Supabase when we actually scraped new data
+            save_current_prices(data["items"], data["prices_file"])
+            try:
+                save_to_supabase(
+                    brand_name, data["grouped"], data["items"], today
+                )
+            except Exception as e:
+                print(f"[{brand_name}] ERROR al guardar en Supabase: {e}")
+        else:
+            print(f"[{brand_name}] Datos cargados de Supabase — sin re-guardar.")
 
     save_history(history)
     generate_interactive_report(results_by_brand, summaries_by_brand, history)
