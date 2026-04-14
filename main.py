@@ -238,15 +238,9 @@ def _parse_price_from_card(card):
     We need to combine both to get the full number (33299900).
     We also try aria-label as a more reliable source.
     """
-    # Strategy 1: aria-label on the price container (most reliable)
-    # e.g. aria-label="33 millones 299 mil 900 pesos" — extract all digits
-    aria_match = re.search(
-        r'class="[^"]*andes-money-amount[^"]*"[^>]*aria-label="([^"]+)"', card
-    )
-    if aria_match:
-        digits = re.sub(r'[^\d]', '', aria_match.group(1))
-        if digits and len(digits) >= 4:
-            return int(digits), None  # price, no cents split needed
+    # Strategy 1 (aria-label) removed: the first andes-money-amount element
+    # in a card is often a cuota/financing price, not the listing price.
+    # Strategy 2 with max() correctly selects the actual (highest) listing price.
 
     # Strategy 2: fraction + cents combined
     # Find all price blocks: each has a fraction and optional cents
@@ -348,12 +342,9 @@ def parse_page(html):
         has_anticipo = bool(re.search(r'anticipo', card, re.IGNORECASE))
 
         # Extract prices using combined fraction+cents strategy
-        aria_price, parsed_prices = _parse_price_from_card(card)
+        _, parsed_prices = _parse_price_from_card(card)
 
-        if aria_price:
-            price = aria_price
-            anticipo = 0
-        elif has_anticipo and parsed_prices and len(parsed_prices) >= 2:
+        if has_anticipo and parsed_prices and len(parsed_prices) >= 2:
             price = max(parsed_prices)
             anticipo = min(parsed_prices)
         elif parsed_prices:
@@ -1305,7 +1296,7 @@ function renderTabs() {
   document.getElementById('brandTabs').innerHTML = Object.keys(DATA).map(b => {
     const active = b === state.brand;
     const style = active ? 'style="background:' + DATA[b].color + ';color:#fff"' : '';
-    return '<button class="brand-tab ' + (active?'active':'') + '" ' + style + ' onclick="switchBrand(\'' + b + '\')">' + b + '</button>';
+    return '<button class="brand-tab ' + (active?'active':'') + '" ' + style + ' onclick="switchBrand(\\'' + b + '\\')">' + b + '</button>';
   }).join('');
 }
 
@@ -1446,7 +1437,7 @@ function renderTable() {
 
   function th(field, label) {
     const cls = state.sort===field ? 'sort-'+state.sortDir : '';
-    return '<th class="'+cls+'" onclick="sortBy(\''+field+'\')">'+label+'</th>';
+    return '<th class="'+cls+'" onclick="sortBy(\\'' + field + '\\')">'+label+'</th>';
   }
 
   const rows = page.map(item => {
