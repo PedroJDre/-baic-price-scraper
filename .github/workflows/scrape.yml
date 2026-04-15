@@ -2,8 +2,8 @@ name: BAIC Price Scraper
 
 on:
   schedule:
-    # Monday and Thursday at 12:00 UTC (9:00 AM Argentina time, GMT-3)
-    - cron: '0 12 * * 1,4'
+    # Every 4 days at 12:00 UTC (9:00 AM Argentina time, GMT-3)
+    - cron: '0 12 */4 * *'
   workflow_dispatch: # Allow manual trigger
 
 permissions:
