@@ -1456,13 +1456,11 @@ def generate_brand_summary(brand_name, grouped, items, history):
         history_block = "\n(Primera corrida — sin historial previo)"
 
     prompt = (
-        f"Sos un analista de mercado automotor argentino. "
-        f"Con base en los siguientes datos del mercado de autos {brand_name} "
-        f"en Mercado Libre Argentina, escribí UN párrafo ejecutivo conciso "
-        f"(3-5 oraciones) en español. "
-        f"Incluí: volumen de publicaciones, tendencia de precios respecto al historial, "
-        f"modelos más activos o con mayor variación, y cualquier dato llamativo. "
-        f"No uses bullet points ni título. Solo el párrafo.\n\n"
+        f"Resumí en exactamente 2-3 oraciones cortas los datos de {brand_name} en Mercado Libre Argentina. "
+        f"Sé directo y factual: mencioná el total de publicaciones, qué modelos lideran en volumen, "
+        f"y si hubo subas/bajas de precio relevantes respecto al historial. "
+        f"Si no hay historial o no hubo cambios de precio, decilo en una frase y no especules. "
+        f"Nada de bullet points, títulos ni análisis especulativos. Solo los hechos.\n\n"
         f"DATOS ACTUALES ({today}):\n{current_block}"
         f"{history_block}"
     )
@@ -1471,7 +1469,7 @@ def generate_brand_summary(brand_name, grouped, items, history):
         client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         message = client.messages.create(
             model=ANTHROPIC_MODEL,
-            max_tokens=350,
+            max_tokens=200,
             messages=[{"role": "user", "content": prompt}],
         )
         summary = message.content[0].text.strip()
