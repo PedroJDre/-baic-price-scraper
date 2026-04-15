@@ -281,8 +281,7 @@ def _scrapedo_request(url):
         "token": SCRAPEDO_TOKEN,
         "url": url,
         "render": "true",
-        "waitSelector": "li.ui-search-layout__item",
-        "customWait": 3000,
+        "customWait": 5000,
         "geoCode": "ar",
     }
     return requests.get(SCRAPEDO_URL, params=params, timeout=120)
@@ -305,18 +304,15 @@ def _firecrawl_request(url):
 
 def _browserless_request(url):
     """Browserless: 1 000 units/mes gratis, Chromium real, excelente anti-bot."""
-    params = {"token": BROWSERLESS_API_KEY}
+    endpoint = f"{BROWSERLESS_URL}?token={BROWSERLESS_API_KEY}"
     payload = {
         "url": url,
-        "waitForSelector": "li.ui-search-layout__item",
-        "rejectResourceTypes": ["image", "font", "stylesheet"],
+        "gotoOptions": {
+            "waitUntil": "networkidle0",
+            "timeout": 60000,
+        },
     }
-    resp = requests.post(
-        BROWSERLESS_URL,
-        params=params,
-        json=payload,
-        timeout=120,
-    )
+    resp = requests.post(endpoint, json=payload, timeout=120)
     resp.raise_for_status()
     return _FakeResponse(resp.text, resp.status_code)
 
@@ -811,20 +807,8 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
       3. Apify actor              — last resort, has its own credit limits
     """
     # ------------------------------------------------------------------ tier 1
-    try:
-        api_listings = fetch_via_ml_api(brand_name, apify_keywords)
-    except Exception as e:
-        print(f"[{brand_name}] ML API fallo inesperadamente: {e}")
-        api_listings = []
-
-    if len(api_listings) >= min_listings_threshold:
-        print(f"[{brand_name}] Total publicaciones finales: {len(api_listings)} (via ML API)")
-        return api_listings
-
-    print(
-        f"[{brand_name}] ML API devolvio {len(api_listings)} publicaciones "
-        f"(umbral: {min_listings_threshold}) — intentando scraping HTML..."
-    )
+    # ML API disabled: returns 403 (requires OAuth app auth, registration failed)
+    api_listings = []
 
     # ------------------------------------------------------------------ tier 2
     scrape_listings = []
