@@ -65,6 +65,25 @@ HASDATA_URL = "https://api.hasdata.com/scrape/chrome"
 SCRAPINGDOG_API_KEY = os.environ.get("SCRAPINGDOG_API_KEY", "")
 SCRAPINGDOG_URL = "https://api.scrapingdog.com/scrape"
 
+# --- Scrape.do (1 000 req/mes gratis, JS rendering) ---
+SCRAPEDO_TOKEN = os.environ.get("SCRAPEDO_TOKEN", "")
+SCRAPEDO_URL = "https://api.scrape.do/"
+
+# --- Firecrawl (500 req/mes gratis, JS rendering) ---
+FIRECRAWL_API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
+FIRECRAWL_URL = "https://api.firecrawl.dev/v1/scrape"
+
+# --- Browserless (1 000 units/mes gratis, browser real) ---
+BROWSERLESS_API_KEY = os.environ.get("BROWSERLESS_API_KEY", "")
+BROWSERLESS_URL = "https://production-sfo.browserless.io/content"
+
+# --- MercadoLibre public API (primary source, no auth required) ---
+ML_API_BASE = "https://api.mercadolibre.com"
+ML_AUTOS_CATEGORY = "MLA1744"  # Autos y Camionetas — Argentina
+ML_API_PAGE_SIZE = 50          # ML API max limit per request
+ML_API_MAX_OFFSET = 1000       # Hard cap enforced by ML (offset + limit <= 1050)
+ML_API_REQUEST_DELAY = 0.1     # seconds between paginated calls (safe margin)
+
 # --- Apify (fallback) ---
 APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", "")
 APIFY_ACTOR_ID = "karamelo~mercadolibre-scraper-espanol-castellano"

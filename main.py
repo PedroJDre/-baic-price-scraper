@@ -40,6 +40,17 @@ from config import (
     HASDATA_URL,
     SCRAPINGDOG_API_KEY,
     SCRAPINGDOG_URL,
+    SCRAPEDO_TOKEN,
+    SCRAPEDO_URL,
+    FIRECRAWL_API_KEY,
+    FIRECRAWL_URL,
+    BROWSERLESS_API_KEY,
+    BROWSERLESS_URL,
+    ML_API_BASE,
+    ML_AUTOS_CATEGORY,
+    ML_API_PAGE_SIZE,
+    ML_API_MAX_OFFSET,
+    ML_API_REQUEST_DELAY,
     APIFY_API_TOKEN,
     APIFY_ACTOR_ID,
     SMTP_SERVER,
@@ -264,6 +275,52 @@ def _scrapingdog_request(url):
     return requests.get(SCRAPINGDOG_URL, params=params, timeout=120)
 
 
+def _scrapedo_request(url):
+    """Scrape.do: 1 000 req/mes gratis, JS rendering, formato GET simple."""
+    params = {
+        "token": SCRAPEDO_TOKEN,
+        "url": url,
+        "render": "true",
+        "waitSelector": "li.ui-search-layout__item",
+        "customWait": 3000,
+        "geoCode": "ar",
+    }
+    return requests.get(SCRAPEDO_URL, params=params, timeout=120)
+
+
+def _firecrawl_request(url):
+    """Firecrawl: 500 req/mes gratis, devuelve rawHtml en JSON."""
+    resp = requests.post(
+        FIRECRAWL_URL,
+        headers={"Authorization": f"Bearer {FIRECRAWL_API_KEY}"},
+        json={"url": url, "formats": ["rawHtml"], "waitFor": 3000},
+        timeout=120,
+    )
+    resp.raise_for_status()
+    data = resp.json()
+    html = (data.get("data") or {}).get("rawHtml", "")
+    status = 200 if html else 422
+    return _FakeResponse(html, status)
+
+
+def _browserless_request(url):
+    """Browserless: 1 000 units/mes gratis, Chromium real, excelente anti-bot."""
+    params = {"token": BROWSERLESS_API_KEY}
+    payload = {
+        "url": url,
+        "waitForSelector": "li.ui-search-layout__item",
+        "rejectResourceTypes": ["image", "font", "stylesheet"],
+    }
+    resp = requests.post(
+        BROWSERLESS_URL,
+        params=params,
+        json=payload,
+        timeout=120,
+    )
+    resp.raise_for_status()
+    return _FakeResponse(resp.text, resp.status_code)
+
+
 def fetch_page(url, retries=2):
     """Fetch a single page trying scrapers in priority order.
 
@@ -286,6 +343,12 @@ def fetch_page(url, retries=2):
         scrapers.append(("ZenRows-premium", lambda u: _zenrows_request(u, premium=True)))
     if CRAWLBASE_TOKEN:
         scrapers.append(("Crawlbase", lambda u: _crawlbase_request(u)))
+    if SCRAPEDO_TOKEN:
+        scrapers.append(("Scrape.do", lambda u: _scrapedo_request(u)))
+    if FIRECRAWL_API_KEY:
+        scrapers.append(("Firecrawl", lambda u: _firecrawl_request(u)))
+    if BROWSERLESS_API_KEY:
+        scrapers.append(("Browserless", lambda u: _browserless_request(u)))
     if SCRAPFLY_API_KEY:
         scrapers.append(("ScrapFly", lambda u: _scrapfly_request(u)))
     if WEBSCRAPINGAPI_KEY:
@@ -503,6 +566,115 @@ def parse_page(html):
     return listings
 
 
+def _ml_api_convert_item(item):
+    """Convert a MercadoLibre API search result to our internal listing format.
+
+    API response shape (relevant fields):
+      id, title, price, currency_id, permalink,
+      seller.nickname, address.city_name, address.state_name
+    """
+    price = item.get("price") or 0
+    try:
+        price = int(price)
+    except (ValueError, TypeError):
+        price = 0
+
+    currency_id = item.get("currency_id", "ARS")
+    currency = "U$S" if currency_id == "USD" else "$"
+
+    seller = (item.get("seller") or {}).get("nickname", "Particular") or "Particular"
+
+    address = item.get("address") or {}
+    city  = address.get("city_name", "") or ""
+    state = address.get("state_name", "") or ""
+    if city and state:
+        location = f"{city} - {state}"
+    else:
+        location = city or state
+
+    # Canonical URL: strip tracking fragment
+    url = (item.get("permalink") or "").split("#")[0]
+
+    return {
+        "title":    item.get("title", ""),
+        "seller":   seller.strip(),
+        "price":    price,
+        "anticipo": 0,
+        "currency": currency,
+        "location": location.strip(),
+        "url":      url,
+    }
+
+
+def fetch_via_ml_api(brand_name, search_terms):
+    """Fetch listings for a brand using the MercadoLibre public REST API.
+
+    Strategy: run one search per term in `search_terms` (brand-level + per-model),
+    paginate each until exhausted or the API's hard offset cap, deduplicate by
+    ML item ID across all queries.
+
+    Returns a list of listings in the internal format, or raises on total failure.
+    """
+    print(f"[{brand_name}] Usando API publica de MercadoLibre...")
+
+    seen_ids = set()
+    all_listings = []
+
+    for term in search_terms:
+        offset = 0
+        term_count = 0
+
+        while offset <= ML_API_MAX_OFFSET:
+            params = {
+                "q":        term,
+                "category": ML_AUTOS_CATEGORY,
+                "limit":    ML_API_PAGE_SIZE,
+                "offset":   offset,
+            }
+            try:
+                resp = requests.get(
+                    f"{ML_API_BASE}/sites/MLA/search",
+                    params=params,
+                    timeout=30,
+                )
+                resp.raise_for_status()
+            except requests.RequestException as e:
+                print(f"  [ML API] Error buscando '{term}' offset={offset}: {e}")
+                break
+
+            data = resp.json()
+            results = data.get("results", [])
+
+            if not results:
+                break  # No more pages for this term
+
+            for item in results:
+                item_id = item.get("id")
+                if item_id and item_id not in seen_ids:
+                    seen_ids.add(item_id)
+                    converted = _ml_api_convert_item(item)
+                    if converted["price"] > 0 and converted["url"]:
+                        all_listings.append(converted)
+                        term_count += 1
+
+            paging = data.get("paging", {})
+            total  = paging.get("total", 0)
+            offset += ML_API_PAGE_SIZE
+
+            # Stop early if we've retrieved all available results
+            if offset > total:
+                break
+
+            if ML_API_REQUEST_DELAY:
+                time.sleep(ML_API_REQUEST_DELAY)
+
+        if term_count:
+            print(f"  [ML API] '{term}': {term_count} nuevas publicaciones")
+
+    print(f"[{brand_name}] ML API total: {len(all_listings)} publicaciones unicas")
+    return all_listings
+
+
 def _apify_convert_item(item):
     """Convert a single Apify result to our internal listing format."""
     price_str = item.get("nuevoPrecio", "0") or "0"
@@ -629,24 +801,43 @@ def fetch_via_apify(apify_keywords):
 
 
 def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_threshold=200):
-    """Fetch all listings for a brand across all pages.
+    """Fetch all listings for a brand.
 
-    Tries ScraperAPI/direct first. If that returns too few results, falls back to Apify.
+    Waterfall strategy (each tier is only tried if the previous returned too few):
+
+      1. MercadoLibre public API  — free, reliable, structured JSON
+      2. HTML scraping chain      — paid scrapers + direct, used as fallback when
+                                    the API fails completely (network issue, etc.)
+      3. Apify actor              — last resort, has its own credit limits
     """
-    all_listings = []
+    # ------------------------------------------------------------------ tier 1
+    try:
+        api_listings = fetch_via_ml_api(brand_name, apify_keywords)
+    except Exception as e:
+        print(f"[{brand_name}] ML API fallo inesperadamente: {e}")
+        api_listings = []
 
-    if SCRAPERAPI_KEY:
-        print(f"[{brand_name}] Usando ScraperAPI para las solicitudes")
-    else:
-        print(f"[{brand_name}] ScraperAPI no configurado, usando solicitudes directas")
+    if len(api_listings) >= min_listings_threshold:
+        print(f"[{brand_name}] Total publicaciones finales: {len(api_listings)} (via ML API)")
+        return api_listings
 
+    print(
+        f"[{brand_name}] ML API devolvio {len(api_listings)} publicaciones "
+        f"(umbral: {min_listings_threshold}) — intentando scraping HTML..."
+    )
+
+    # ------------------------------------------------------------------ tier 2
+    scrape_listings = []
     consecutive_empty = 0
+    last_page = 1
+
     for page in range(1, MAX_PAGES + 1):
-        url = build_page_url(page, base_url)
-        print(f"[{brand_name}] Pagina {page}: {url}")
+        last_page = page
+        page_url = build_page_url(page, base_url)
+        print(f"[{brand_name}] Pagina {page}: {page_url}")
 
         try:
-            html = fetch_page(url)
+            html = fetch_page(page_url)
         except requests.RequestException as e:
             print(f"  Error en pagina {page}: {e}")
             break
@@ -657,52 +848,55 @@ def fetch_all_listings(brand_name, base_url, apify_keywords, min_listings_thresh
         if not listings:
             consecutive_empty += 1
             if page == 1:
-                print(f"  DEBUG: HTML length = {len(html)}")
-                print(f"  DEBUG: Has 'ui-search-layout': {'ui-search-layout' in html}")
-                print(f"  DEBUG: Has 'poly-card': {'poly-card' in html}")
-                print(f"  DEBUG: Has 'andes-money-amount': {'andes-money-amount' in html}")
-                # Show sample of first <li> with ui-search-layout in it
-                li_idx = html.find('<li')
-                if li_idx >= 0:
-                    print(f"  DEBUG: First <li> tag: {repr(html[li_idx:li_idx+200])}")
-                # Show a snippet around the MLA url pattern to verify URL format
-                mla_idx = html.find('/MLA-')
-                if mla_idx >= 0:
-                    print(f"  DEBUG: MLA URL context: {repr(html[max(0,mla_idx-50):mla_idx+80])}")
+                print(f"  DEBUG: HTML length={len(html)}, "
+                      f"ui-search-layout={'yes' if 'ui-search-layout' in html else 'no'}, "
+                      f"poly-card={'yes' if 'poly-card' in html else 'no'}")
             if consecutive_empty >= 2:
-                print(f"  2 paginas vacias consecutivas — fin de resultados")
+                print("  2 paginas vacias consecutivas — fin de resultados")
                 break
-            print(f"  Pagina vacia — reintentando siguiente pagina...")
+            print("  Pagina vacia — continuando...")
         else:
             consecutive_empty = 0
-            all_listings.extend(listings)
+            scrape_listings.extend(listings)
 
         if page < MAX_PAGES:
             time.sleep(REQUEST_DELAY_SECONDS)
 
-    if page == MAX_PAGES and listings:
+    if last_page == MAX_PAGES and scrape_listings:
         print(f"  AVISO: Se alcanzo el limite de {MAX_PAGES} paginas — pueden existir mas resultados")
 
-    print(f"[{brand_name}] Total publicaciones (scraping directo): {len(all_listings)}")
+    print(f"[{brand_name}] Scraping HTML: {len(scrape_listings)} publicaciones")
 
-    # Supplement with Apify if scraping returned fewer than expected
-    if len(all_listings) < min_listings_threshold:
-        print(f"[{brand_name}] Pocas publicaciones ({len(all_listings)}), complementando con Apify...")
-        apify_listings = fetch_via_apify(apify_keywords)
+    # Merge API + scraping results, deduplicating by URL
+    all_listings = list(api_listings)
+    seen_urls = {item["url"] for item in all_listings if item["url"]}
+    for item in scrape_listings:
+        if item["url"] and item["url"] not in seen_urls:
+            seen_urls.add(item["url"])
+            all_listings.append(item)
 
-        # Merge: deduplicate by URL (normalize both sides — strip #fragment)
-        seen_urls = {item["url"].split('#')[0] for item in all_listings if item["url"]}
-        new_count = 0
-        for item in apify_listings:
-            norm_url = item["url"].split('#')[0] if item["url"] else ""
-            if norm_url and norm_url not in seen_urls:
-                seen_urls.add(norm_url)
-                item["url"] = norm_url  # store normalized URL
-                all_listings.append(item)
-                new_count += 1
+    if len(all_listings) >= min_listings_threshold:
+        print(f"[{brand_name}] Total publicaciones finales: {len(all_listings)} (API + scraping)")
+        return all_listings
 
-        print(f"[{brand_name}] Apify agrego {new_count} publicaciones nuevas")
+    # ------------------------------------------------------------------ tier 3
+    print(
+        f"[{brand_name}] Pocas publicaciones ({len(all_listings)}), "
+        f"intentando Apify como ultimo recurso..."
+    )
+    apify_listings = fetch_via_apify(apify_keywords)
 
+    seen_urls = {item["url"].split("#")[0] for item in all_listings if item["url"]}
+    new_count = 0
+    for item in apify_listings:
+        norm_url = item["url"].split("#")[0] if item["url"] else ""
+        if norm_url and norm_url not in seen_urls:
+            seen_urls.add(norm_url)
+            item["url"] = norm_url
+            all_listings.append(item)
+            new_count += 1
+
+    print(f"[{brand_name}] Apify agrego {new_count} publicaciones nuevas")
     print(f"[{brand_name}] Total publicaciones finales: {len(all_listings)}")
     return all_listings
 
