@@ -305,14 +305,7 @@ def _firecrawl_request(url):
 def _browserless_request(url):
     """Browserless: 1 000 units/mes gratis, Chromium real, excelente anti-bot."""
     endpoint = f"{BROWSERLESS_URL}?token={BROWSERLESS_API_KEY}"
-    payload = {
-        "url": url,
-        "gotoOptions": {
-            "waitUntil": "networkidle0",
-            "timeout": 60000,
-        },
-    }
-    resp = requests.post(endpoint, json=payload, timeout=120)
+    resp = requests.post(endpoint, json={"url": url}, timeout=120)
     resp.raise_for_status()
     return _FakeResponse(resp.text, resp.status_code)
 
