@@ -1,871 +1,55 @@
 {
-  "https://auto.mercadolibre.com.ar/MLA-3174464746-chery-tiggo-4-15-hev-premium-er-_JM": {
-    "price": 30800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3174274664-chery-tiggo-2-pro-max-15-comfort-_JM": {
-    "price": 21650,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1729575669-chery-tiggo-4-15-hev-premium-0km-2025-2026-_JM": {
-    "price": 30600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1747095913-chery-tiggo-2-15-comfort-_JM": {
-    "price": 15000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3173635730-chery-tiggo-4-15-hev-premium-_JM": {
-    "price": 29900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1709641225-chery-tiggo-7-pro-hybrid-cvt-0km-entrega-inmediata-s-_JM": {
-    "price": 29000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2911893282-chery-arrizo-8-phev-confort-15-elias-homsi-_JM": {
-    "price": 33600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3168405344-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-omar-_JM": {
-    "price": 31990,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2856181916-chery-tiggo-7-pro-0km-mejor-precio-contado-a-_JM": {
-    "price": 30000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1738004255-chery-tiggo-2-20-comfort-_JM": {
-    "price": 14900000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1720303637-chery-tiggo-2-0km-entrega-inmediata-s-_JM": {
-    "price": 20500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3180383288-chery-tiggo-5-20-luxury-cvt-_JM": {
-    "price": 16700,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3143504618-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-mp-_JM": {
-    "price": 32870,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1650006215-chery-arrizo-8-0km-hibrido-enchufable-stock-fisico-2026-_JM": {
-    "price": 32500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1740919163-chery-tiggo2-promax-comfort-financiadocontadopermuta-mp-_JM": {
-    "price": 16101,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3017497156-chery-arrizo-8-hybrid-okm-2026-_JM": {
-    "price": 32000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3191234490-chery-tiggo-2-pro-max-15-comfort-cvt-0km-2026-g-_JM": {
-    "price": 22000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1718447199-chery-tiggo-2-pro-max-15-comfort-cvt-elias-homsi-_JM": {
-    "price": 24800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1690813229-chery-tiggo-2-pro-max-15-comfort-cvt-208tcrossc3-0km-mv-_JM": {
-    "price": 25000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2896806798-chery-arrizo-8-csh-hibrid-dp-_JM": {
-    "price": 34600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3100845824-chery-tiggo-8-16-t-pro-luxury-cvt-omar-_JM": {
-    "price": 31648,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1720349357-chery-tiggo-7-pro-hibrido-automatico-0km-caba-zona-oeste-x-_JM": {
-    "price": 28500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1676468383-arrizo-8-hybrid-15t-phev-comfort-fabio-arrieta-_JM": {
-    "price": 33600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2890957090-chery-tiggo-7-pro-hybrid-_JM": {
-    "price": 22000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1668322951-chery-tiggo-2-0km-entrega-inmedia-s-_JM": {
-    "price": 22800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3011937368-chery-tiggo-7-pro-hybrid-hev-cvt-2008-0km-a-_JM": {
-    "price": 29900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3177796768-chery-tiggo-4-hev-premium-financiado-permuta-contado-mp-_JM": {
-    "price": 23450,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1744343533-chery-tiggo7-pro-hybrid-hev-financiadopermutacontado-mp-_JM": {
-    "price": 24920,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3105876182-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-tomas-_JM": {
-    "price": 33900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1679363693-chery-tiggo-2-pro-max-comfort-stock-fisico-retira-ya-f-_JM": {
-    "price": 20600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3112385346-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-mp-_JM": {
-    "price": 32900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3006191518-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-okm-2026-_JM": {
-    "price": 29500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2819142326-chery-arrizo-8-15t-hibrido-corollaventou5fastback-0km-jg-_JM": {
-    "price": 48999999,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1717067581-chery-tiggo-7-pro-0km-entrega-inmediatas-_JM": {
-    "price": 29000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1697706815-chery-tiggo-4-hibrida-0km-entrega-inmediata-contado-suv-_JM": {
-    "price": 30500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3157938266-chery-tiggo-4-15-t-hev-premium-cvt-tomas-_JM": {
-    "price": 31150,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3187992374-chery-tiggo-2-pro-max-15-comfort-0km-2026-g-_JM": {
-    "price": 19900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3170330898-chery-tiggo-2-pro-max-comforttiggo-7-pro-0km-contado-_JM": {
-    "price": 21100,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3074914146-chery-tiggo-2-pro-max-15-comfort-agustina-sesin-_JM": {
-    "price": 21500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1675749247-chery-tiggo-2-pro-max-15-comfort-asesor-fabio-arrieta-_JM": {
-    "price": 24800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1742651561-chery-tiggo-2-pro-max-15-comfort-_JM": {
-    "price": 21600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1747003005-chery-tiggo-2-pro-max-15-comfort-_JM": {
-    "price": 22000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3183894566-chery-tiggo-2-pro-max-15-comfort-_JM": {
-    "price": 21650,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2832059174-chery-tiggo-2-mt-pro-0km-208-mejor-precio-contado-a-_JM": {
-    "price": 22000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2819186838-chery-tiggo-2-pro-max-15-cvt-208sanderoc3kardian-okm-jg-_JM": {
-    "price": 35190000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3165081932-chery-tiggo-7-pro-hybrid-premium-15-mhev-rm-_JM": {
-    "price": 29990,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3043074384-chery-tiggo7-8-4-2-stock-einmediata-30800-en-calle-s-_JM": {
-    "price": 25100,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1648886531-chery-tiggo-2-pro-max-0km-2026-stock-fisico-inmediata-e-_JM": {
-    "price": 22000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2632837782-chery-tiggo-7-mhev-15-hibrido-2026-0km-entrega-inmediata-_JM": {
-    "price": 29800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1739450525-chery-tiggo-4-pro-15t-luxury-cvt-0km-2025-2026-_JM": {
-    "price": 30000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2911996994-chery-arrizo-8-_JM": {
-    "price": 33000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2911958532-chery-tiggo-7-pro-hybrid-15t-premium-dp-_JM": {
-    "price": 29200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3188360626-chery-fulwin-15-ii-sedan-_JM": {
-    "price": 10500000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1737600571-chery-tiggo-7-15-pro-hev-premium-cvt-tomas-_JM": {
-    "price": 29610,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1604141961-chery-tiggo-7-pro-hybrid-_JM": {
-    "price": 28000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1701645393-chery-tiggo-2-pro-max-15-confort-cvt-0km-2026-t-_JM": {
-    "price": 22900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1614845251-chery-tiggo-7-pro-hybrid-chery-wuhu-almagro-ps-_JM": {
-    "price": 44341000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3187881082-chery-tiggo-3-16-3-luxury-_JM": {
-    "price": 15300,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3168470212-chery-tiggo-8-16-t-pro-luxury-cvt-omar-_JM": {
-    "price": 42850,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3187984782-chery-tiggo-4-20-comfort-us-_JM": {
-    "price": 18500000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3039735310-chery-tiggo-7-0km-mejor-precio-contado-a-_JM": {
-    "price": 30000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3159790396-chery-tiggo-7-15-pro-hev-premium-cvt-tomas-_JM": {
-    "price": 29610,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3153060138-chery-tiggo-7-15-pro-hev-premium-cvt-tomas-_JM": {
-    "price": 29610,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1742737041-chery-tiggo-4-15-comfort-_JM": {
-    "price": 17900000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2999166792-chery-tiggo-4-hidryd-hev-premiun-dp-_JM": {
-    "price": 30200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3164641220-chery-tiggo-2-20-comfort-eg-automoviles-_JM": {
-    "price": 14200000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1676465501-chery-tiggo-7-pro-15-premium-hybrid-fabio-arrieta-_JM": {
-    "price": 30800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1679623539-chery-arrizo-8-hybrid-fisico-entrega-inmediata-permuta-f-_JM": {
-    "price": 32300,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3074467574-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-jl-_JM": {
+  "https://auto.mercadolibre.com.ar/MLA-1666730689-chery-tiggo-4-pro-comfort-0km-no-baic-no-byd-no-jetour-e-_JM": {
     "price": 25900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1740890199-chery-tiggo-7-pro-hybrid-15-premium-0km-2026-g-_JM": {
-    "price": 28900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3191177386-chery-tiggo-7-pro-hybrid-15-premium-cvt-0km-2026-g-_JM": {
-    "price": 28500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3188384488-chery-tiggo7pro-hybrid-cvt-financiadopermutacontado-mp-_JM": {
-    "price": 24920,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3184935708-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-l-_JM": {
-    "price": 29400,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3184114112-chery-tiggo-7-pro-hybrid-0km-entrega-inmediata-_JM": {
-    "price": 28900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1744343651-chery-tiggo-7-pro-hybrid-15-premium-cvt-0km-2026-g-_JM": {
-    "price": 28000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3170304872-chery-tiggo-7-pro-hybrid-hev-premium-cvtpeugeot-2008-0km-_JM": {
-    "price": 29300,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3131002308-chery-0km-entrega-inmediata-_JM": {
-    "price": 29100,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3121381006-chery-tiggo-7-pro-hybrid-0km-entrega-inmediata-_JM": {
-    "price": 28900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3075456560-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 44000000,
     "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1701207937-chery-tiggo-7-pro-0km-hybrid-hev-premium-cvt-mejor-precio-a-_JM": {
-    "price": 30000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3013592296-chery-tiggo-7-pro-hybr-15-prem-cvttaostcros3008-0km-mv-_JM": {
-    "price": 35000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3163183062-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3189328250-chery-tiggo7pro-hybrid-cvtfinanciadopermutacontado-mp-_JM": {
-    "price": 24920,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1747064747-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3030368442-chery-tiggo-7-pro-hibrida-0km-financiado-contado-dt-_JM": {
-    "price": 29000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3024678634-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1746991541-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 31000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1742652397-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 32900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3187933910-chery-tiggo-7-pro-hybrid-mejoramos-cualquier-presupuesto-s-_JM": {
-    "price": 26000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1742635317-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3066019306-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1712971455-chery-tiggo-2-pro-max-0km-el-mejor-precio-a-_JM": {
-    "price": 21000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1644189075-chery-tiggo-7-pro-hybrid-_JM": {
-    "price": 24700,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2703730060-chery-tiggo-2-pro-max-15l-mt-confort-dp-_JM": {
-    "price": 23000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3189403752-chery-tiggo-20-f2-luxury-4x2-at-138cv-_JM": {
-    "price": 12900000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3030470132-chery-arrizo-8-hybrid-15t-phev-chs-comfort-e-_JM": {
-    "price": 32000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2828600656-chery-tiggo-7-pro-hybrid-cvt-0km-entrega-inmedia-s-_JM": {
-    "price": 28950,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1734839935-chery-tiggo-20-confort-4x2-127cv-gf-_JM": {
-    "price": 14490000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1709767749-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-elias-homsi-_JM": {
-    "price": 30800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3112437330-chery-tiggo-4-15-t-hev-premium-cvt-entrega-inmediata-omar-_JM": {
-    "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1711329007-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3100849042-chery-tiggo-2-15-pro-max-comfort-cvt-omar-_JM": {
-    "price": 23900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1691786329-chery-tiggo-7-pro-hybrid-cvt-0km-entrega-inmedia-s-_JM": {
-    "price": 28900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1702349575-chery-tiggo-2-20-comfort-_JM": {
-    "price": 13000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3168567182-chery-tiggo-4-15-t-hev-premium-cvt-entrega-inmediata-omar-_JM": {
-    "price": 32100,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3164813366-chery-tiggo-5-20-luxury-at-_JM": {
-    "price": 18500000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3182895322-chery-tiggo-5-20-luxury-cvt-_JM": {
-    "price": 16800000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1730647499-chery-qq-11-light-_JM": {
-    "price": 8900000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3143631022-chery-tiggo-7-15-pro-hev-premium-cvt-mp-_JM": {
-    "price": 29610,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1651471417-chery-tiggo-7-pro-hybrid-15-mhev-premium-entrega-inmediata-_JM": {
-    "price": 29500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1741027979-chery-tiggo-7-15-pro-hev-premium-cvt-_JM": {
-    "price": 32900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1676458543-tiggo-7-pro-hybrid-15t-mhev-premium-ls-_JM": {
-    "price": 30700,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1703748579-chery-tiggo-4pro-luxury-cvt-contadofinanciadoe-inmediat-s-_JM": {
-    "price": 30500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1713188907-chery-arrizo-8-hybrid-0km-el-mejor-precio-contado-a-_JM": {
-    "price": 31900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3157767376-chery-tiggo-4-15-t-hev-premium-cvt-tomas-_JM": {
-    "price": 29950,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2681043528-chery-tiggo-2-pro-max-cvt-comfort-jc-_JM": {
-    "price": 24000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3143631320-chery-tiggo-8-16-t-pro-luxury-cvt-mp-_JM": {
-    "price": 42872,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1711463351-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-jl-_JM": {
-    "price": 29400,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3158122240-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-tomas-_JM": {
-    "price": 40275,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3112431286-chery-tiggo-4-15-t-hev-premium-cvt-mp-_JM": {
-    "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1674205713-chery-tiggo-7-pro-hybrid-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2783190692-chery-tiggo-7-pro-hybrid-15-mhev-premium-stock-fisico-0km-_JM": {
-    "price": 31600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1690785331-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 29500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2964416844-chery-arrizo-8-15-t-phev-comfort-ag-_JM": {
-    "price": 34600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2863251784-chery-tiggo-7-pro-hybrid-0km-entrega-inmediata-s-_JM": {
-    "price": 28900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1709924441-chery-tiggo-8-pro-16t-luxury-7dct-elias-homsi-_JM": {
-    "price": 44900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3112385572-chery-tiggo-8-16-t-pro-luxury-cvt-mp-_JM": {
-    "price": 42872,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3143567606-chery-tiggo-4-15-t-hev-premium-cvt-mp-_JM": {
-    "price": 31155,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1716884191-vendo-chery-tiggo-3-16-luxury-cvt-_JM": {
-    "price": 18500000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3159437520-chery-tiggo-4-15-t-hev-premium-cvt-tomas-_JM": {
-    "price": 31200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1671585145-chery-tiggo-7-pro-hybrid-15-turbo-_JM": {
-    "price": 29500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2922610822-tiggo-7-pro-hybrid-15t-premium-dp-_JM": {
-    "price": 29200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3112420514-chery-tiggo-7-15-pro-hev-premium-cvt-mp-_JM": {
-    "price": 29552,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1670509563-chery-tiggo-4-hybrid-0km-entrega-inmediata-s-_JM": {
-    "price": 30700,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3154431894-chery-arrizo-8-super-hibrido-_JM": {
-    "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1650369061-chery-arrizo-8-super-hybrid-0km-enchufable-corolla-hybrid-_JM": {
-    "price": 31600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1684082805-chery-tiggo-7-pro-hybrid-e-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1676798727-chery-arrizo-8-phev-0km-2026-_JM": {
-    "price": 33200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1663255667-chery-tiggo-4-hev-hybrid-automatico-0km-2026-_JM": {
-    "price": 31800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3100694216-chery-tiggo-7-15-pro-hev-premium-cvt-omar-_JM": {
-    "price": 33500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2827990392-chery-tiggo-2-0km-2026-contado-entrega-inmediata-permuta-e-_JM": {
-    "price": 20500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3131100600-chery-tiggo-0km-entrega-inmediata-_JM": {
-    "price": 28900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1729576337-chery-tiggo-2-pro-max-15-comfort-cvt-0km-2025-2026-_JM": {
-    "price": 23300,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1692703393-chery-tiggo-4-pro-luxury-cvt-0km-2026-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3188391422-chery-arrizo-8-hybrid-15t-comfort-0km-2026-g-_JM": {
-    "price": 30000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1748859467-arrizo8-familiar-hibrido-15t-sedan-financiaci-automatico-bg-_JM": {
-    "price": 33400,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1694778027-chery-arrizo-8-hybrid-15tcomfort-corolasentravirtus-0km-j-_JM": {
-    "price": 46999999,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3038494048-chery-arrizo-8-hybrid-0km-2026-contado-financiado-dt-_JM": {
-    "price": 32000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1747014999-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
-    "price": 34600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3184171250-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
-    "price": 34600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1724015975-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
-    "price": 48000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3075432752-chery-arrizo-8-hybrid-15t-phev-chs-comfort-jl-_JM": {
-    "price": 32300,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3100673110-chery-tiggo-4-15-t-hev-premium-cvt-entrega-inmediata-omar-_JM": {
-    "price": 33500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1746775181-chery-tiggo-20-confort-4x2-127cv-_JM": {
-    "price": 11800000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1652875645-chery-tiggo-7-hybrid-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2539379202-chery-tiggo-7-hibrida-nueva-linea-_JM": {
-    "price": 29900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1699149691-chery-tiggo-8-7-asientos-cvt-0km-entrega-inmediata-contado-t-_JM": {
-    "price": 42000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1748843169-chery-tiggo-4-finanaciacion-4x2-hibrida-15-chino-entrega-bg-_JM": {
-    "price": 31000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3099931012-chery-tiggo-4-15-hev-premium-contado-financiado-0km-2026-g-_JM": {
-    "price": 30500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3094423026-chery-tiggo-4-0km-entrega-inmediata-s-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3079319856-chery-tiggo-4-15-6-dct-2026-_JM": {
-    "price": 26600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3029730322-chery-tiggo-4-15-hev-premium-_JM": {
-    "price": 44887500,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3174200850-chery-tiggo-4-15-hev-premium-_JM": {
-    "price": 32000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1747002043-chery-tiggo-4-15-hev-premium-_JM": {
-    "price": 32200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1742650379-chery-tiggo-4-15-hev-premium-_JM": {
-    "price": 32500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3184172066-chery-tiggo-4-15-hev-premium-_JM": {
-    "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3152810176-chery-tiggo-4-15-hev-premium-dp-_JM": {
-    "price": 30200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2898516870-chery-tiggo-7-pro-hybrid-_JM": {
-    "price": 32900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2827117458-chery-tiggo-7-pro-2026-0km-no-byd-no-baic-no-jetour-i-_JM": {
-    "price": 20000,
-    "currency": "US$"
   },
   "https://auto.mercadolibre.com.ar/MLA-1644317885-tiggo-4-hev-hybrid-0km-sub-mg3-luxury-toyota-corolla-c-_JM": {
     "price": 28600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1687850057-chery-arrizo-8-automilano-_JM": {
-    "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2862182042-chery-arrizo-8-15-turbo-phev-_JM": {
-    "price": 48000000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1729594883-chery-arrizo-8-hybrid-15t-phev-chs-comfort-0km-2025-2026-_JM": {
-    "price": 32000,
-    "currency": "US$"
+  "https://auto.mercadolibre.com.ar/MLA-1750787755-chery-tiggo-7-pro-hybrid-hev-premium-cvt2008-0km-contado-l-_JM": {
+    "price": 29700,
+    "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1676425421-chery-tiggo-7-pro-hybrid-15t-mhev-premium-fabio-arrieta-_JM": {
+  "https://auto.mercadolibre.com.ar/MLA-3043074384-chery-tiggo7-8-4-2-stock-einmediata-30800-en-calle-s-_JM": {
+    "price": 25100,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1697706815-chery-tiggo-4-hibrida-0km-entrega-inmediata-contado-suv-d-_JM": {
+    "price": 30500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1692703393-chery-tiggo-4-pro-luxury-cvt-0km-2026-_JM": {
     "price": 30800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2797520456-chery-tigo-7-pro-_JM": {
-    "price": 29500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3164228052-chery-tiggo-7-pro-hybrid-0km-el-mejor-precio-contado-a-_JM": {
-    "price": 29500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2828824776-chery-tiggo-7-pro-0km-el-mejor-precio-a-_JM": {
-    "price": 29999,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1723923721-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 44000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3115936292-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 41000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2861963242-chery-tiggo-7pro-hybrid-_JM": {
-    "price": 30900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2785817538-chery-tiggo-7-pro-hibrid-_JM": {
-    "price": 32300,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2989002414-chery-tiggo-7-pro-_JM": {
-    "price": 32999,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3111293648-chery-tiggo-20-f2-luxury-4x2-at-138cv-_JM": {
-    "price": 18990000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2912037382-chery-tiggo-2-_JM": {
-    "price": 24600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1676493383-chery-tiggo-4-pro-15t-hybrid-premium-elias-homsi-_JM": {
-    "price": 31400,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3183967718-chery-qq-11-comfort-_JM": {
-    "price": 8520000,
     "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-3132562456-chery-tiggo-4-hybrid-15l-dht-hev-premium-cs-_JM": {
     "price": 32400,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1736404191-chery-tiggo-5-20-luxury-at-_JM": {
-    "price": 19500000,
     "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1735676381-chery-arrizo-5-15-luxury-_JM": {
-    "price": 19800,
-    "currency": "US$"
   },
   "https://auto.mercadolibre.com.ar/MLA-3013564876-chery-tiggo-4-pro-15-comfort-cvtkicks2008byd-0km-finan-mv-_JM": {
     "price": 25999999,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1666730689-chery-tiggo-4-pro-comfort-0km-no-baic-no-byd-no-jetour-i-_JM": {
-    "price": 25900,
-    "currency": "US$"
-  },
   "https://auto.mercadolibre.com.ar/MLA-1747039607-chery-tiggo-4-hev-full-0km-2026-hibrida-importada-china-7-_JM": {
     "price": 30900,
-    "currency": "US$"
+    "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-1747016911-chery-tiggo-4-pro-15-comfort-cvt-_JM": {
     "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2815563712-chery-tiggo-2-pro-max-15-confort-cvt-0km-entrega-inmediata-_JM": {
-    "price": 25050,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1645543195-chery-tiggo-2-pro-max-stock-fisico-_JM": {
-    "price": 23550,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2847757710-chery-arrizo-8-hybrid-primer-automatico-0km-2026-_JM": {
-    "price": 32800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2667844742-chery-tiggo-4-hibrido-chery-wuhu-almagro-ps-_JM": {
-    "price": 32700,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1706586663-chery-tiggo-2-pro-max-15-comfort-cvt-_JM": {
-    "price": 25500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3160502580-chery-tiggo-confort-16-4x2-125-cv-negra-unico-dueno-primera-_JM": {
-    "price": 13900000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1688007487-nuevo-chery-arrizo-8-confort-automatico-hibrido-enchufable-_JM": {
-    "price": 29995,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1742864801-chery-tiggo-5-20-4x2-luxury-cvt-l17-_JM": {
-    "price": 18900000,
+  "https://auto.mercadolibre.com.ar/MLA-1747048653-chery-tiggo-2-pro-2026-tasa-0-_JM": {
+    "price": 21499,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1601212909-chery-tiggo-8-pro-16t-luxury-cvt-_JM": {
-    "price": 66500000,
+  "https://auto.mercadolibre.com.ar/MLA-1751922747-chery-tiggo-4-pro-15t-luxury-cvt-0km-2026-2025-_JM": {
+    "price": 30900,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-2830509290-tiggo-7-mhev-pro-_JM": {
-    "price": 31888,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3024852100-chery-tiggo-4-hybrid-15-bydkickstcross2008taos-0km-jg-_JM": {
-    "price": 44415000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1608056845-chery-tiggo-7-pro-hybrid-chery-wuhu-almagro-ps-_JM": {
-    "price": 30702,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3164315928-chery-tiggo-20-f2-luxury-4x2-at-138cv-autobaires-_JM": {
-    "price": 13000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3114881660-chery-tiggo-5-20-luxury-at-_JM": {
-    "price": 21000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1741020313-chery-arrizo-8-hybrid-15t-phev-chs-comfort-0km-2025-2026-_JM": {
-    "price": 31000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3059809364-chery-tiggo-20-confort-lista-para-transferir-2012-_JM": {
-    "price": 7000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3098939880-chery-tiggo-3-16-confort-ecosport-duster-2008-suran-tracker-_JM": {
-    "price": 19500000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3168322832-chery-tiggo-4-hibrido-automatico-0km-zona-sur-caba-x-_JM": {
-    "price": 29999,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1679510635-chery-tiggo-2-pro-at-2026-0km-_JM": {
-    "price": 24000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3154466850-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-ph-_JM": {
-    "price": 29900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1732922525-chery-tiggo-5-20-luxury-at-_JM": {
-    "price": 15000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2622334138-chery-tiggo-4-pro-15t-luxury-cvt-hibrida-2026-0km-_JM": {
-    "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1742374109-chery-tiggo-2-pro-max-15-comfort-cvt-_JM": {
-    "price": 20900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3164481596-chery-tiggo-4-pro-el-mejor-precio-contado-renegade-a-_JM": {
+  "https://auto.mercadolibre.com.ar/MLA-3164481596-chery-tiggo-4-0km-el-mejor-precio-contado-a-_JM": {
     "price": 30500,
-    "currency": "US$"
+    "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-1711863071-tiggo-4-hybrid-15t-_JM": {
     "price": 45500000,
@@ -873,278 +57,1042 @@
   },
   "https://auto.mercadolibre.com.ar/MLA-2860049760-chery-tiggo-4-pro-15t-hev-premium-_JM": {
     "price": 32000,
-    "currency": "US$"
+    "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-2999203248-chery-tiggo-4-pro-15t-luxury-cvt-2026-okm-_JM": {
     "price": 30900,
-    "currency": "US$"
+    "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-2860063204-chery-tiggo-4-pro-15t-premium-cvt-_JM": {
     "price": 45900000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1733913673-chery-tiggo-4-pro-15t-luxury-cvt-_JM": {
-    "price": 24500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1747093075-chery-tiggo-4-20-comfort-cvt-_JM": {
-    "price": 14990,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3109661792-chery-tiggo-20-confort-4x2-127cv-_JM": {
-    "price": 12800000,
+  "https://auto.mercadolibre.com.ar/MLA-1671671567-chery-tiggo-4-0km-hibrido-contado-el-mejor-precio-a-_JM": {
+    "price": 31300,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-3159395258-chery-tiggo-20-confort-buen-estado-_JM": {
-    "price": 9000000,
+  "https://auto.mercadolibre.com.ar/MLA-2819029832-chery-tiggo-8-pro-16t-luxury-7dct-taossw4comander-0km-jg-_JM": {
+    "price": 64972000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-2999182046-chery-tiggo-4-hybrid-15l-hev-premium-elias-homsi-_JM": {
-    "price": 31400,
-    "currency": "US$"
+  "https://auto.mercadolibre.com.ar/MLA-3013554796-chery-tiggo8-pro-16t-luxury-7dctcommandersw4-0km-finan-mv-_JM": {
+    "price": 62999999,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2622334138-chery-tiggo-4-pro-15t-luxury-cvt-hibrida-2026-0km-_JM": {
+    "price": 31500,
+    "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-2681032894-chery-tiggo-4-pro-hybrid-jc-_JM": {
     "price": 32500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1741255423-chery-tiggo-3-16-3-luxury-_JM": {
-    "price": 19899000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-3151304832-chery-qq-10-confort-security--_JM": {
-    "price": 9000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1739371249-chery-tiggo-4-20-comfort-_JM": {
-    "price": 17600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1653087945-chery-tiggo-4-hybrid-_JM": {
-    "price": 33500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2833117772-chery-tiggo-7-mhev-hibrid-entrega-imnediata-apto-financiaci-_JM": {
-    "price": 29500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1694875013-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-elias-homsi-_JM": {
-    "price": 30800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3153730912-chery-arrizo-8-15t-phev-super-hybrid-comfort-dht-0km-2026-_JM": {
-    "price": 33550,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1716694373-chery-tiggo-3-16-3-confort-_JM": {
-    "price": 16000000,
+  "https://auto.mercadolibre.com.ar/MLA-3168322832-chery-tiggo-4-hibrido-automatico-0km-zona-sur-caba-x-_JM": {
+    "price": 29999,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-3013461896-chery-tiggo-3-16-3-confort-_JM": {
-    "price": 19000000,
+  "https://auto.mercadolibre.com.ar/MLA-1676493383-chery-tiggo-4-pro-15t-hybrid-premium-elias-homsi-_JM": {
+    "price": 31400,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-2998982870-chery-tiggo-7-pro-hybrid-4x2-cvt-zona-sur-canning-js-_JM": {
-    "price": 32900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1748860185-chery-tiggo-8-pro-camioneta-china-lujo-familiar-7-lugares-tl-_JM": {
-    "price": 44000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3191227686-chery-16t-suv-financiacion-usado-bna-familiar-7-asientos-bg-_JM": {
-    "price": 45200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1739465933-chery-qq-10-confort-security-_JM": {
-    "price": 8700,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3011850260-chery-tiggo-20-f2-confort-4x2-138cv-_JM": {
-    "price": 13500000,
+  "https://auto.mercadolibre.com.ar/MLA-1679510635-chery-tiggo-2-pro-at-2026-0km-_JM": {
+    "price": 24000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1742348723-chery-tiggo-20-luxury-4x4-127cv-_JM": {
-    "price": 11500000,
+  "https://auto.mercadolibre.com.ar/MLA-1648848509-chery-tiggo-4-0km-cvt-entrega-inmediata-2026-e-_JM": {
+    "price": 26491,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-2828808850-chery-arrizo-8-csh-0km-entrega-inmediata-s-_JM": {
-    "price": 32100,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3127992792-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 29600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2815384894-chery-tiggo-7-pro-hybrid-15-luxury-at-0km-entrega-inmediata-_JM": {
-    "price": 30200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3095566614-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1699820009-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 31000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3132870954-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 32900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3111520726-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 30500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3132833074-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 32900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2765368322-nueva-chery-tiggo-7-hibrida-mhev-no-byd-no-baic-no-haval-_JM": {
-    "price": 30100,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3158235536-chery-tiggo-5-20-comfort-cvt-_JM": {
-    "price": 18900000,
+  "https://auto.mercadolibre.com.ar/MLA-1733913673-chery-tiggo-4-pro-15t-luxury-cvt-_JM": {
+    "price": 24500,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1699456439-chery-tiggo-2-pro-max-15-comfort-manual-0km-financiado-t-_JM": {
-    "price": 20800,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3039609516-chery-arrizo-8-0km-phev-hibrido-a-_JM": {
-    "price": 31900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2785327342-chery-tiggo-7-pro-0km-entrega-inmediata-al-mejor-precio-e-_JM": {
-    "price": 29600,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1745483189-chery-tiggo-20-f2-luxury-4x2-at-138cv-_JM": {
-    "price": 12000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2703757690-chery-tiggo-7-pro-hybrid-15t-premium-dp-_JM": {
-    "price": 29200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1735373401-chery-tiggo-20-f2-luxury-4x4-138cv-_JM": {
-    "price": 12500000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3159387570-chery-tiggo-3-16-luxury-cvt-_JM": {
-    "price": 11000,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1599716507-chery-tiggo-7-hev-stock-fisico-0km-2026-_JM": {
-    "price": 29100,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1722478593-chery-fulwin-15-ii-hatchback-_JM": {
-    "price": 12900000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1663059983-chery-tiggo-5-20-confort-cvt-_JM": {
-    "price": 23000000,
-    "currency": "$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-2912010374-chery-tiggo-7-_JM": {
+  "https://auto.mercadolibre.com.ar/MLA-1720708461-chery-tiggo-4-pro-15-comfort-cvt-_JM": {
     "price": 31500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3136948808-chery-tiggo-3-16-luxury-cvt-_JM": {
-    "price": 18490000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-2789015022-chery-tiggo-7-mhev-_JM": {
-    "price": 30200,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3165042322-chery-tiggo-5-20-luxury-cvt-_JM": {
-    "price": 19500000,
+  "https://auto.mercadolibre.com.ar/MLA-1644386363-chery-tiggo-4-pro-15t-luxury-_JM": {
+    "price": 29900,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-3189931062-chery-tiggo-20-confort-4x2-127cv-_JM": {
-    "price": 12000000,
+  "https://auto.mercadolibre.com.ar/MLA-2828824596-chery-tiggo-0km-4-pro-hev-a-_JM": {
+    "price": 31000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1620634393-chery-tiggo-5-20-luxury-_JM": {
-    "price": 21650000,
+  "https://auto.mercadolibre.com.ar/MLA-2847861216-chery-tiggo-7-pro-hybrid-automatico-0km-2026-_JM": {
+    "price": 28700,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1725610909-chery-qq-10-confort-security-_JM": {
-    "price": 10700000,
+  "https://auto.mercadolibre.com.ar/MLA-3083124668-chery-tiggo-4-pro-15t-luxury-cvt-_JM": {
+    "price": 38000000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-2898536278-chery-tiggo-7-pro-hybrid-15t-mhev-premium-_JM": {
-    "price": 31790,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1730873623-chery-tiggo-5-20-comfort-cvt-_JM": {
-    "price": 10500,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3184308104-chery-tiggo-20-luxury-4x4-127cv-_JM": {
-    "price": 11000000,
+  "https://auto.mercadolibre.com.ar/MLA-3126873368-chery-tiggo-0km-entrega-inmediata-s-_JM": {
+    "price": 30800,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1732806353-chery-qq-10-confort-security-_JM": {
-    "price": 9900,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-3132826856-chery-tiggo-5-luxury-cvt-automatica-full-_JM": {
-    "price": 20999900,
+  "https://auto.mercadolibre.com.ar/MLA-2589115982-chery-tiggo-4-pro-luxury-cvt-_JM": {
+    "price": 10000000,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-3168294896-chery-tiggo4-hibrido-motor-15-_JM": {
-    "price": 29000,
-    "currency": "US$"
+  "https://auto.mercadolibre.com.ar/MLA-2837335636-chery-tiggo-4-hibrido-mejor-precio-contado-a-_JM": {
+    "price": 31100,
+    "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1731096121-chery-fulwin-15-ii-sedan-_JM": {
-    "price": 9800000,
+  "https://auto.mercadolibre.com.ar/MLA-1746952581-chery-tiggo-4-pro-15-comfort-mt-_JM": {
+    "price": 22500000,
     "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-2782273262-chery-tiggo-7hev-pro-15-cvt-15-4x2-0km-2026-8-4-2-_JM": {
     "price": 29100,
-    "currency": "US$"
+    "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1687704837-chery-tiggo-4-hybrid-_JM": {
+  "https://auto.mercadolibre.com.ar/MLA-2790880582-chery-tiggo-4-hibrida-15l-hev-premium-a-_JM": {
+    "price": 34000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2828746348-chery-tiggo-4-7-0km-hibrido-a-_JM": {
+    "price": 30999,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2815588634-tiggo-4-pro-15-t-luxury-cvt-leer-descripcion-_JM": {
+    "price": 26500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2856181916-chery-tiggo-7-pro-0km-mejor-precio-contado-a-_JM": {
+    "price": 30000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2797030366-chery-tiggo-4-hev-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3168294896-chery-tiggo4-hibrido-motor-15-_JM": {
+    "price": 29000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1644243391-chery-tiggo-4-pro-0km-_JM": {
+    "price": 29900000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3017442976-chery-tiggo-7-pro-hybrid-2026-0km-territory-taos-tucson-_JM": {
+    "price": 29200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1663115519-chey-tiggo-4-pro-luxury-0km-_JM": {
+    "price": 28500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1727519285-chery-tiggo-4-hev-hybrid-0km-2026-baicbydjetour-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1553742585-chery-tiggo-4-pro-15-comfort-cvt-_JM": {
+    "price": 33900000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3188384488-chery-tiggo7pro-hybrid-cvt-financiadopermutacontado-mp-_JM": {
+    "price": 24920,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1744343533-chery-tiggo7-pro-hybrid-hev-financiadopermutacontado-mp-_JM": {
+    "price": 24920,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2890957090-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 22000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1690785331-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 29500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3011937368-chery-tiggo-7-pro-hybrid-hev-cvt-2008-0km-a-_JM": {
+    "price": 29900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1709641225-chery-tiggo-7-pro-hybrid-cvt-0km-entrega-inmediata-s-_JM": {
+    "price": 29100,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1741183815-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 27990,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3006191518-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-okm-2026-_JM": {
+    "price": 29500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3187933910-chery-tiggo-7-pro-hybrid-mejoramos-cualquier-presupuesto-s-_JM": {
+    "price": 26000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1614845251-chery-tiggo-7-pro-hybrid-chery-wuhu-almagro-ps-_JM": {
+    "price": 44341000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3074914146-chery-tiggo-2-pro-max-15-comfort-agustina-sesin-_JM": {
+    "price": 21500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3198345710-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 29800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3074467574-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-jl-_JM": {
+    "price": 25900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2632837782-chery-tiggo-7-mhev-15-hibrido-2026-0km-entrega-inmediata-_JM": {
+    "price": 29800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1717067581-chery-tiggo-7-pro-0km-entrega-inmediatas-_JM": {
+    "price": 29150,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1723923721-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 44000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3159256230-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 25000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1720349357-chery-tiggo-7-pro-hibrido-automatico-0km-caba-zona-oeste-x-_JM": {
+    "price": 28500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3154466850-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-ph-_JM": {
+    "price": 29900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2911958532-chery-tiggo-7-pro-hybrid-15t-premium-dp-_JM": {
+    "price": 29200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1750557047-chery-tiggo-7-pro-hybrid-0km-entrega-inmediata-_JM": {
+    "price": 28900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3193408662-tiggo-7-5-pro-hibirdo-15-chino-financiacion-premium-cvt-bg-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3191177386-chery-tiggo-7-pro-hybrid-15-premium-cvt-0km-2026-g-_JM": {
+    "price": 28500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3184935708-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-l-_JM": {
+    "price": 29400,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3184114112-chery-tiggo-7-pro-hybrid-0km-entrega-inmediata-_JM": {
+    "price": 28900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3131002308-chery-tiggo-7-0km-entrega-inmediata-_JM": {
+    "price": 29200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3115936292-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 41000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3075456560-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 44000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1701207937-chery-tiggo-7-pro-0km-hybrid-hev-premium-cvt-mejor-precio-a-_JM": {
+    "price": 30000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3013592296-chery-tiggo-7-pro-hybr-15-prem-cvttaostcros3008-0km-mv-_JM": {
+    "price": 35000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3193409908-chery-tiggo-7-15t-hibrida-camioneta-familia-china-barato-tl-_JM": {
+    "price": 28700,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3163183062-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1747064747-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3030368442-chery-tiggo-7-pro-hibrida-0km-financiado-contado-dt-_JM": {
+    "price": 29000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3024678634-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1746991541-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 31000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1742652397-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3195055344-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 42000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1742635317-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3066019306-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3039735310-chery-tiggo-7-0km-mejor-precio-contado-a-_JM": {
+    "price": 30000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1676465501-chery-tiggo-7-pro-15-premium-hybrid-fabio-arrieta-_JM": {
+    "price": 30800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1711463351-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-jl-_JM": {
+    "price": 29400,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2796252750-chery-tiggo-7-pro-2026-hibrid-15-mhev-premiun-okm-2026-_JM": {
+    "price": 41180000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1691786329-chery-tiggo-7-pro-hybrid-cvt-0km-entrega-inmedia-s-_JM": {
+    "price": 29000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1676458543-tiggo-7-pro-hybrid-15t-mhev-premium-ls-_JM": {
+    "price": 30700,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2922610822-tiggo-7-pro-hybrid-15t-premium-dp-_JM": {
+    "price": 29200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1709767749-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-elias-homsi-_JM": {
+    "price": 30800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1604141961-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 28000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1740890199-chery-tiggo-7-pro-hybrid-15-premium-0km-2026-g-_JM": {
+    "price": 28900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1684082805-chery-tiggo-7-pro-hybrid-e-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1739004637-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
     "price": 31500,
-    "currency": "US$"
+    "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-3065085546-chery-tiggo-20-confort-4x2-127cv-_JM": {
-    "price": 11500000,
+  "https://auto.mercadolibre.com.ar/MLA-1718926241-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 49500000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1671585145-chery-tiggo-7-pro-hybrid-15-turbo-_JM": {
+    "price": 29500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1674205713-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3189328250-chery-tiggo7pro-hybrid-cvtfinanciadopermutacontado-mp-_JM": {
+    "price": 24920,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3153060138-chery-tiggo-7-15-pro-hev-premium-cvt-tomas-_JM": {
+    "price": 29610,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2828600656-chery-tiggo-7-pro-hybrid-cvt-0km-entrega-inmedia-s-_JM": {
+    "price": 28950,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1652875645-chery-tiggo-7-hybrid-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2863251784-chery-tiggo-7-pro-hybrid-0km-entrega-inmediata-s-_JM": {
+    "price": 29050,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1644189075-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 24700,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2539379202-chery-tiggo-7-hibrida-nueva-linea-_JM": {
+    "price": 29900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1711329007-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2797520456-chery-tigo-7-pro-_JM": {
+    "price": 29500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1694875013-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-elias-homsi-_JM": {
+    "price": 30800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3121381006-chery-tiggo-7-pro-hybrid-0km-entrega-inmediata-_JM": {
+    "price": 29110,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2785817538-chery-tiggo-7-pro-hibrid-_JM": {
+    "price": 32300,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1709924441-chery-tiggo-8-pro-16t-luxury-7dct-elias-homsi-_JM": {
+    "price": 44900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2783190692-chery-tiggo-7-pro-hybrid-15-mhev-premium-stock-fisico-0km-_JM": {
+    "price": 31600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3164228052-chery-tiggo-7-pro-hybrid-0km-el-mejor-precio-contado-a-_JM": {
+    "price": 29700,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1608056845-chery-tiggo-7-pro-hybrid-chery-wuhu-almagro-ps-_JM": {
+    "price": 30702,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1737600571-chery-tiggo-7-15-pro-hev-premium-cvt-tomas-_JM": {
+    "price": 29610,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3131100600-chery-tiggo-0km-entrega-inmediata-_JM": {
+    "price": 28950,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1748860185-chery-tiggo-8-pro-camioneta-china-lujo-familiar-7-lugares-tl-_JM": {
+    "price": 44000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3191227686-chery-16-suv-financiacion-usado-chin-familiar-7-asientos-bg-_JM": {
+    "price": 44200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3192752732-chery-tiggo-8-pro-camioneta-suv-familia-chino-4x4-dc-_JM": {
+    "price": 46600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3099731942-chery-tiggo-8-pro-16t-luxury-7-contado-financiado-0km-2026-g-_JM": {
+    "price": 40990,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1679610361-chery-tiggo-8-pro-luxury-entrega-inmediata-fisica-f-_JM": {
+    "price": 41900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1744031387-chery-tiggo8pro-luxury-7dct-financiadopermutacontado-mp-_JM": {
+    "price": 32620,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1658634655-chery-tiggo-7-15-hibrido-premiun-cvt-_JM": {
+    "price": 31900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1744343651-chery-tiggo-7-pro-hybrid-15-premium-cvt-0km-2026-g-_JM": {
+    "price": 28000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3192754396-tiggo-7-familia-suv-camioneta-hibrido-barato-utilitaria-dc-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3196246088-chery-tiggo-7-15-pro-hev-premium-cvt-omar-_JM": {
+    "price": 29600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2898516870-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2827117458-chery-tiggo-7-pro-2026-0km-no-byd-no-baic-no-jetour-e-_JM": {
+    "price": 20000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3201451348-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-0km-2026-2025-_JM": {
+    "price": 29000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3177571752-chery-tiggo-7-pro-hybrid-15t-premium-2026-gris-traut-_JM": {
+    "price": 33900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3095566614-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1699820009-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 31000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3132870954-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3111520726-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 30500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3132833074-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2703757690-chery-tiggo-7-pro-hybrid-15t-premium-dp-_JM": {
+    "price": 29200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2989002414-chery-tiggo-7-pro-_JM": {
+    "price": 32999,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2765368322-nueva-chery-tiggo-7-hibrida-mhev-no-byd-no-baic-no-haval-_JM": {
+    "price": 30100,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1694807113-chery-tiggo-8-pro-16t-luxury-7dct-fabio-arrieta-_JM": {
+    "price": 44900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1599716507-chery-tiggo-7-hev-stock-fisico-0km-2026-_JM": {
+    "price": 29100,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3159790396-chery-tiggo-7-15-pro-hev-premium-cvt-tomas-_JM": {
+    "price": 29610,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1676425421-chery-tiggo-7-pro-hybrid-15t-mhev-premium-fabio-arrieta-_JM": {
+    "price": 30800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3143631022-chery-tiggo-7-15-pro-hev-premium-cvt-mp-_JM": {
+    "price": 29610,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1741027979-chery-tiggo-7-15-pro-hev-premium-cvt-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2785327342-chery-tiggo-7-pro-0km-entrega-inmediata-al-mejor-precio-e-_JM": {
+    "price": 29600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2912010374-chery-tiggo-7-_JM": {
+    "price": 31500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3112420514-chery-tiggo-7-15-pro-hev-premium-cvt-mp-_JM": {
+    "price": 29552,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3100694216-chery-tiggo-7-15-pro-hev-premium-cvt-omar-_JM": {
+    "price": 33500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2998982870-chery-tiggo-7-pro-hybrid-4x2-cvt-zona-sur-canning-js-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3174280158-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 29900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1750057267-chery-tiggo-7-pro-hybrid-premium-15-mhev-rm-_JM": {
+    "price": 29990,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3178101954-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 43900000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1727676373-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 40000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2828824776-chery-tiggo-7-pro-0km-el-mejor-precio-a-_JM": {
+    "price": 29999,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2830509290-tiggo-7-mhev-pro-_JM": {
+    "price": 31888,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3074665952-chery-tiggo-8-pro-16t-luxury-7dct-jl-_JM": {
+    "price": 42800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3199328548-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 35000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1652863329-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 42000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3132935656-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 46600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2847625710-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 44900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3075426558-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
+    "price": 29900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1699149691-chery-tiggo-8-7-asientos-cvt-0km-entrega-inmediata-contado-t-_JM": {
+    "price": 42000,
     "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-1694695761-chery-tiggo-7-pro-hybrid-15-hev-cvt-bydpeugeotbaic-0km-jg-_JM": {
     "price": 41499999,
     "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-3133179962-chery-tiggo-5-20-luxury-cvt-_JM": {
-    "price": 12000,
-    "currency": "US$"
+  "https://auto.mercadolibre.com.ar/MLA-2681124146-chery-tiggo-7-pro-hybrid-chery-wuhu-motors-jc-_JM": {
+    "price": 30699,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1730849887-chery-tiggo-7-pro-hybrid-15-mhev-premium-2026-0-km-_JM": {
+    "price": 30190,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1647098787-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 31900,
+    "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-3058746506-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
     "price": 30500,
-    "currency": "US$"
+    "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1676284597-tiggo-4-hybrid-15l-hev-premium-chery-asesor-fabio-arrieta-_JM": {
-    "price": 31400,
-    "currency": "US$"
+  "https://auto.mercadolibre.com.ar/MLA-2789015022-chery-tiggo-7-mhev-_JM": {
+    "price": 30200,
+    "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1651446745-chery-tiggo-4-p-hybrid-15-hev-premium-0km-entrega-inmediata-_JM": {
-    "price": 29999,
-    "currency": "US$"
-  },
-  "https://auto.mercadolibre.com.ar/MLA-1648848509-chery-tiggo-4-0km-cvt-entrega-inmediata-2026-e-_JM": {
+  "https://auto.mercadolibre.com.ar/MLA-1685726703-chery-tiggo-7-15t-mhev-premium-no-jetour-no-baic-no-gwm-_JM": {
     "price": 31000,
-    "currency": "US$"
+    "currency": "$"
   },
-  "https://auto.mercadolibre.com.ar/MLA-1727676373-chery-tiggo-7-pro-hybrid-15-hev-premium-cvt-_JM": {
-    "price": 40000000,
+  "https://auto.mercadolibre.com.ar/MLA-3154433158-chery-tiggo-7-pro-hibrido-_JM": {
+    "price": 29500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3189433710-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 31000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1741292617-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 39900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3167710986-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 42900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3111314198-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 42900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2898536278-chery-tiggo-7-pro-hybrid-15t-mhev-premium-_JM": {
+    "price": 31790,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1670245861-chery-tiggo-0km-hibrido-el-mejor-precio-contado-a-_JM": {
+    "price": 30000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2827901256-chery-tiggo-15t-7pro-hybrid-cvt-2026-_JM": {
+    "price": 44000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3182975166-chery-tiggo-7-pro-hybrid-2026-smart-garage-_JM": {
+    "price": 31600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1679363693-chery-tiggo-2-pro-max-comfort-stock-fisico-retira-ya-f-_JM": {
+    "price": 20600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3100845824-chery-tiggo-8-16-t-pro-luxury-cvt-omar-_JM": {
+    "price": 31648,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3143631320-chery-tiggo-8-16-t-pro-luxury-cvt-mp-_JM": {
+    "price": 42872,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3112385572-chery-tiggo-8-16-t-pro-luxury-cvt-mp-_JM": {
+    "price": 42800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2852143820-chery-tiggo-2-pro-max-_JM": {
+    "price": 22600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3153058646-chery-tiggo-8-16-t-pro-luxury-cvt-tomas-_JM": {
+    "price": 42800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3163228562-chery-tiggo-8-pro-16-luxury-cvt-_JM": {
+    "price": 46600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2998954326-chery-tiggo-8-pro-16-luxury-cvt-2026-0km-_JM": {
+    "price": 41000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2472838690-chery-tiggo-8-pro-16-luxury-cvt-_JM": {
+    "price": 43800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1576112999-chery-tiggo-7-pro-hybrid-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1644231487-chery-tiggo-pro-8-luxury-7-asientos-16t-_JM": {
+    "price": 44990,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2769619270-chery-tiggo-7-15-pro-hev-premiun-cvt-_JM": {
+    "price": 45500000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1562929265-chery-tiggo-2-pro-15-confort-_JM": {
+    "price": 21850,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1736575443-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 43000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1601212909-chery-tiggo-8-pro-16t-luxury-cvt-_JM": {
+    "price": 66500000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1644399767-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 43900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3168831052-chery-tiggo-8-pro-16t-luxury-7dct-2026-0-km-_JM": {
+    "price": 41950,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1703999281-chery-tiggo-8-pro-290t-16t-luxury-2026-blanco-traut-_JM": {
+    "price": 45900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1706326807-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 43000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1733904395-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 42900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3136875886-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 42900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3136974304-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 42900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3158259950-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 43900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2794540646-chery-tiggo-8-_JM": {
+    "price": 46600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2844104224-chery-tiggo-8-pro-luxury-7dct-0km-entrega-inmediata-s-_JM": {
+    "price": 42000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3091052732-chery-tiggo-8-pro-16-luxury-0km-2026-_JM": {
+    "price": 40950,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1711371477-chery-tiggo-pro-8-luxury-_JM": {
+    "price": 37000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1708573221-chery-tiggo-4-pro-15-comfort-cvt-_JM": {
+    "price": 22000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2534509048-chery-tiggo-2-pro-15-confort-cvt-_JM": {
+    "price": 24200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2847782258-chery-tiggo-7pro-_JM": {
+    "price": 34500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2794409792-jetour-x70-chery-tiggo-8-7asientos-8at-15turbo-_JM": {
+    "price": 31500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3075444572-chery-tiggo-8-pro-16t-luxury-7dct-_JM": {
+    "price": 23500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1719943675-chery-tiggo-8-pro-16-luxury-cvt-_JM": {
+    "price": 35000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3188391422-chery-arrizo-8-hybrid-15t-comfort-0km-2026-g-_JM": {
+    "price": 30000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1650006215-chery-arrizo-8-0km-hibrido-enchufable-stock-fisico-2026-_JM": {
+    "price": 32500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2896806798-chery-arrizo-8-csh-hibrid-dp-_JM": {
+    "price": 34600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3017497156-chery-arrizo-8-hybrid-okm-2026-_JM": {
+    "price": 32000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1694778027-chery-arrizo-8-hybrid-15tcomfort-corolasentravirtus-0km-j-_JM": {
+    "price": 46999999,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3196240702-chery-arrizo-8-sedan-hibrido-chino-alta-gama-barato-tl-_JM": {
+    "price": 29600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3192739856-arrizo-8-corolla-dc-familiar-chery-sedan-automatico-barato-_JM": {
+    "price": 34600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3038494048-chery-arrizo-8-hybrid-0km-2026-contado-financiado-dt-_JM": {
+    "price": 32000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1747014999-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 34600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3184171250-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 34600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1724015975-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 48000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3075432752-chery-arrizo-8-hybrid-15t-phev-chs-comfort-jl-_JM": {
+    "price": 32300,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2911996994-chery-arrizo-8-_JM": {
+    "price": 33000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1679623539-chery-arrizo-8-hybrid-fisico-entrega-inmediata-permuta-f-_JM": {
+    "price": 32300,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2819142326-chery-arrizo-8-15t-hibrido-corollaventou5fastback-0km-jg-_JM": {
+    "price": 48999999,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1713188907-chery-arrizo-8-hybrid-0km-el-mejor-precio-contado-a-_JM": {
+    "price": 31900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2847757710-chery-arrizo-8-hybrid-primer-automatico-0km-2026-_JM": {
+    "price": 32800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1687850057-chery-arrizo-8-automilano-_JM": {
+    "price": 31500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3030470132-chery-arrizo-8-hybrid-15t-phev-chs-comfort-e-_JM": {
+    "price": 24221,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2964416844-chery-arrizo-8-15-t-phev-comfort-ag-_JM": {
+    "price": 34600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1688007487-nuevo-chery-arrizo-8-confort-automatico-hibrido-enchufable-_JM": {
+    "price": 29995,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1650369061-chery-arrizo-8-super-hybrid-0km-enchufable-corolla-hybrid-_JM": {
+    "price": 31600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1676798727-chery-arrizo-8-phev-0km-2026-_JM": {
+    "price": 33200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2862182042-chery-arrizo-8-15-turbo-phev-_JM": {
+    "price": 48000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3158122240-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-tomas-_JM": {
+    "price": 40275,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2856159398-chery-arrizo-8-csh-0km-entrega-inmediata-_JM": {
+    "price": 32100,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1748859467-arrizo8-familiar-hibrido-15t-sedan-financiaci-automatico-bg-_JM": {
+    "price": 30800,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3201552352-chery-arrizo-8-hybrid-15t-phev-chs-comfort-0km-2026-2025-_JM": {
+    "price": 42000,
     "currency": "$"
   },
   "https://auto.mercadolibre.com.ar/MLA-3069731130-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
     "price": 31500,
-    "currency": "US$"
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3059144556-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 31500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1679452887-chery-arrizo-8-hybrid-_JM": {
+    "price": 32000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2828808850-chery-arrizo-8-csh-0km-entrega-inmediata-s-_JM": {
+    "price": 32100,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2922667454-chery-arrizo-8-phev-comfort-hybrid-_JM": {
+    "price": 35000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3153730912-chery-arrizo-8-15t-phev-super-hybrid-comfort-dht-0km-2026-_JM": {
+    "price": 33550,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3154431894-chery-arrizo-8-super-hibrido-_JM": {
+    "price": 31500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3039609516-chery-arrizo-8-0km-phev-hibrido-a-_JM": {
+    "price": 31900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3169634204-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 30900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2866200826-chery-arrizo-8-phev-confort-_JM": {
+    "price": 28600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3122201792-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 25000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2911893282-chery-arrizo-8-phev-confort-15-elias-homsi-_JM": {
+    "price": 33600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1676468383-arrizo-8-hybrid-15t-phev-comfort-fabio-arrieta-_JM": {
+    "price": 33600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2815714764-chery-arrizo-8-15t-phev-_JM": {
+    "price": 34600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3163189828-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 50940000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2778504516-chery-arrizo-8-15-turbo-phev-_JM": {
+    "price": 34600,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2841515058-nuevo-chery-arrizo-8-phev-no-corolla-hibrido-sedan-hibrido-_JM": {
+    "price": 33200,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1650212771-chery-arrizo-8-hybrid-primer-_JM": {
+    "price": 32100,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3164323784-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 33000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1722043503-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 32700,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3074316834-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 31500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1692756107-chery-arrizo-8-csh-2026-0km-_JM": {
+    "price": 32550,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3196356726-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-omar-_JM": {
+    "price": 31900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3112385346-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-mp-_JM": {
+    "price": 32900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3105876182-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-tomas-_JM": {
+    "price": 33900,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3153730982-chery-arrizo-8-15t-phev-super-hybrid-comfort-dht-0-km-2026-_JM": {
+    "price": 33550,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-1722523465-chery-arrizo-8-hybrid-15t-phev-chs-comfort-_JM": {
+    "price": 34500,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-3143504618-chery-arrizo-8-15-t-hev-comfort-plug-in-cvt-mp-_JM": {
+    "price": 32870,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2826371270-chery-arrizo-8-_JM": {
+    "price": 54000000,
+    "currency": "$"
+  },
+  "https://auto.mercadolibre.com.ar/MLA-2799811742-chery-arrizo-8-phev-comfort-hibrido-enchufable-ps-_JM": {
+    "price": 44890000,
+    "currency": "$"
   }
 }
