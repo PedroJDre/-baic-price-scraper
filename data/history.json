@@ -1,114 +1,4 @@
 {
-  "2026-05-21": {
-    "Chery": {
-      "total": 263,
-      "models": {
-        "3": {
-          "avg": 20185,
-          "min": 20185,
-          "max": 20185,
-          "count": 1,
-          "n_up": 0,
-          "n_down": 0,
-          "n_new": 1
-        },
-        "7": {
-          "avg": 28900,
-          "min": 28900,
-          "max": 28900,
-          "count": 1,
-          "n_up": 0,
-          "n_down": 0,
-          "n_new": 0
-        },
-        "Arrizo 6": {
-          "avg": 63680,
-          "min": 26311,
-          "max": 101048,
-          "count": 2,
-          "n_up": 1,
-          "n_down": 1,
-          "n_new": 0
-        },
-        "Arrizo 8": {
-          "avg": 4124556,
-          "min": 14500,
-          "max": 50937000,
-          "count": 62,
-          "n_up": 8,
-          "n_down": 1,
-          "n_new": 9
-        },
-        "CHERY": {
-          "avg": 32000,
-          "min": 32000,
-          "max": 32000,
-          "count": 1,
-          "n_up": 0,
-          "n_down": 0,
-          "n_new": 0
-        },
-        "NEW": {
-          "avg": 210000,
-          "min": 210000,
-          "max": 210000,
-          "count": 1,
-          "n_up": 0,
-          "n_down": 0,
-          "n_new": 0
-        },
-        "Otros": {
-          "avg": 39249,
-          "min": 14804,
-          "max": 84455,
-          "count": 8,
-          "n_up": 6,
-          "n_down": 2,
-          "n_new": 0
-        },
-        "Tiggo 2": {
-          "avg": 2657905,
-          "min": 20500,
-          "max": 20855000,
-          "count": 8,
-          "n_up": 0,
-          "n_down": 1,
-          "n_new": 1
-        },
-        "Tiggo 4": {
-          "avg": 4600107,
-          "min": 14500,
-          "max": 46210000,
-          "count": 62,
-          "n_up": 0,
-          "n_down": 7,
-          "n_new": 26
-        },
-        "Tiggo 7": {
-          "avg": 2612862,
-          "min": 19240,
-          "max": 43050000,
-          "count": 61,
-          "n_up": 0,
-          "n_down": 4,
-          "n_new": 49
-        },
-        "Tiggo 8": {
-          "avg": 3679254,
-          "min": 14211,
-          "max": 64580000,
-          "count": 56,
-          "n_up": 17,
-          "n_down": 5,
-          "n_new": 11
-        }
-      }
-    },
-    "BAIC": {
-      "total": 0,
-      "models": {}
-    }
-  },
   "2026-05-25": {
     "Chery": {
       "total": 0,
@@ -503,6 +393,16 @@
     }
   },
   "2026-07-01": {
+    "Chery": {
+      "total": 0,
+      "models": {}
+    },
+    "BAIC": {
+      "total": 0,
+      "models": {}
+    }
+  },
+  "2026-07-05": {
     "Chery": {
       "total": 0,
       "models": {}
