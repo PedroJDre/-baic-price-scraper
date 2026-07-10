@@ -1,4 +1,756 @@
 {
+  "2026-05-05": {
+    "Chery": {
+      "total": 501,
+      "models": {
+        "7": {
+          "avg": 30900,
+          "min": 30900,
+          "max": 30900,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "Arrizo 8": {
+          "avg": 4877944,
+          "min": 19800,
+          "max": 48000000,
+          "count": 54,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 52
+        },
+        "CHERY": {
+          "avg": 8970333,
+          "min": 32000,
+          "max": 12990000,
+          "count": 6,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 6
+        },
+        "FACE 13": {
+          "avg": 3927800,
+          "min": 5000,
+          "max": 8200000,
+          "count": 4,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 4
+        },
+        "FULWIN 15": {
+          "avg": 7320510,
+          "min": 7600,
+          "max": 12900000,
+          "count": 9,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 9
+        },
+        "QQ 11": {
+          "avg": 6486326,
+          "min": 5100,
+          "max": 14800000,
+          "count": 23,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 23
+        },
+        "Tiggo 2": {
+          "avg": 8304129,
+          "min": 8000,
+          "max": 35500000,
+          "count": 102,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 100
+        },
+        "Tiggo 3": {
+          "avg": 13202488,
+          "min": 10200,
+          "max": 22000000,
+          "count": 26,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 25
+        },
+        "Tiggo 4": {
+          "avg": 5228717,
+          "min": 17300,
+          "max": 50093622,
+          "count": 91,
+          "n_up": 1,
+          "n_down": 0,
+          "n_new": 83
+        },
+        "Tiggo 7": {
+          "avg": 5176978,
+          "min": 24700,
+          "max": 48900000,
+          "count": 133,
+          "n_up": 1,
+          "n_down": 0,
+          "n_new": 127
+        },
+        "Tiggo 8": {
+          "avg": 10610206,
+          "min": 12000,
+          "max": 62999999,
+          "count": 52,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 48
+        }
+      }
+    },
+    "BAIC": {
+      "total": 0,
+      "models": {}
+    }
+  },
+  "2026-05-09": {
+    "Chery": {
+      "total": 213,
+      "models": {
+        "7": {
+          "avg": 28900,
+          "min": 28900,
+          "max": 28900,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "Arrizo 8": {
+          "avg": 5155264,
+          "min": 19800,
+          "max": 50937000,
+          "count": 49,
+          "n_up": 1,
+          "n_down": 0,
+          "n_new": 44
+        },
+        "CHERY": {
+          "avg": 32000,
+          "min": 32000,
+          "max": 32000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "Tiggo 2": {
+          "avg": 22187,
+          "min": 20500,
+          "max": 23460,
+          "count": 3,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 3
+        },
+        "Tiggo 3": {
+          "avg": 17130000,
+          "min": 17130000,
+          "max": 17130000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "Tiggo 4": {
+          "avg": 5059731,
+          "min": 18500,
+          "max": 44415000,
+          "count": 61,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 53
+        },
+        "Tiggo 7": {
+          "avg": 3948433,
+          "min": 24700,
+          "max": 43050000,
+          "count": 59,
+          "n_up": 0,
+          "n_down": 2,
+          "n_new": 53
+        },
+        "Tiggo 8": {
+          "avg": 9421379,
+          "min": 15900,
+          "max": 64972000,
+          "count": 38,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 35
+        }
+      }
+    },
+    "BAIC": {
+      "total": 311,
+      "models": {
+        "BJ30": {
+          "avg": 36560,
+          "min": 32800,
+          "max": 42600,
+          "count": 100,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 100
+        },
+        "BJ40": {
+          "avg": 1602167,
+          "min": 49000,
+          "max": 61900000,
+          "count": 40,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 40
+        },
+        "BJ60": {
+          "avg": 76195,
+          "min": 68900,
+          "max": 78600,
+          "count": 23,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 23
+        },
+        "EU5": {
+          "avg": 27114,
+          "min": 25200,
+          "max": 29900,
+          "count": 38,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 38
+        },
+        "U5": {
+          "avg": 2884480,
+          "min": 20492,
+          "max": 36500000,
+          "count": 48,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 48
+        },
+        "X25": {
+          "avg": 9516900,
+          "min": 11500,
+          "max": 16300000,
+          "count": 5,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 5
+        },
+        "X35": {
+          "avg": 26133,
+          "min": 24850,
+          "max": 26900,
+          "count": 9,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 9
+        },
+        "X55": {
+          "avg": 889518,
+          "min": 29000,
+          "max": 41000000,
+          "count": 48,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 48
+        }
+      }
+    }
+  },
+  "2026-05-13": {
+    "Chery": {
+      "total": 259,
+      "models": {
+        "7": {
+          "avg": 28900,
+          "min": 28900,
+          "max": 28900,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "Arrizo 6": {
+          "avg": 71148,
+          "min": 26646,
+          "max": 100766,
+          "count": 5,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 5
+        },
+        "Arrizo 8": {
+          "avg": 4082926,
+          "min": 14500,
+          "max": 50937000,
+          "count": 63,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 23
+        },
+        "CHERY": {
+          "avg": 32000,
+          "min": 32000,
+          "max": 32000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "NEW": {
+          "avg": 210000,
+          "min": 210000,
+          "max": 210000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "Otros": {
+          "avg": 47661,
+          "min": 15839,
+          "max": 88900,
+          "count": 8,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 8
+        },
+        "Tiggo 2": {
+          "avg": 6263055,
+          "min": 20500,
+          "max": 19000000,
+          "count": 7,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 5
+        },
+        "Tiggo 3": {
+          "avg": 15450000,
+          "min": 15000000,
+          "max": 15900000,
+          "count": 2,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 2
+        },
+        "Tiggo 4": {
+          "avg": 4356759,
+          "min": 18500,
+          "max": 44415000,
+          "count": 61,
+          "n_up": 2,
+          "n_down": 2,
+          "n_new": 14
+        },
+        "Tiggo 7": {
+          "avg": 2088669,
+          "min": 24700,
+          "max": 40800000,
+          "count": 55,
+          "n_up": 0,
+          "n_down": 3,
+          "n_new": 20
+        },
+        "Tiggo 8": {
+          "avg": 2186259,
+          "min": 15900,
+          "max": 59900001,
+          "count": 55,
+          "n_up": 0,
+          "n_down": 3,
+          "n_new": 28
+        }
+      }
+    },
+    "BAIC": {
+      "total": 320,
+      "models": {
+        "BJ30": {
+          "avg": 582234,
+          "min": 32900,
+          "max": 51900000,
+          "count": 95,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 58
+        },
+        "BJ40": {
+          "avg": 1642003,
+          "min": 49000,
+          "max": 61900000,
+          "count": 39,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 3
+        },
+        "EU5": {
+          "avg": 989959,
+          "min": 25200,
+          "max": 36615000,
+          "count": 38,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 3
+        },
+        "U5": {
+          "avg": 2884506,
+          "min": 20492,
+          "max": 36500000,
+          "count": 48,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 9
+        },
+        "X25": {
+          "avg": 4084875,
+          "min": 12000,
+          "max": 16300000,
+          "count": 4,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 2
+        },
+        "X35": {
+          "avg": 1411297,
+          "min": 19500,
+          "max": 39000000,
+          "count": 48,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 43
+        },
+        "X55": {
+          "avg": 1055964,
+          "min": 25000,
+          "max": 49000000,
+          "count": 48,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 16
+        }
+      }
+    }
+  },
+  "2026-05-17": {
+    "Chery": {
+      "total": 215,
+      "models": {
+        "7": {
+          "avg": 28900,
+          "min": 28900,
+          "max": 28900,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "Arrizo 6": {
+          "avg": 76110,
+          "min": 26798,
+          "max": 100766,
+          "count": 3,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "Arrizo 8": {
+          "avg": 4826823,
+          "min": 14500,
+          "max": 50937000,
+          "count": 63,
+          "n_up": 2,
+          "n_down": 2,
+          "n_new": 8
+        },
+        "CHERY": {
+          "avg": 32000,
+          "min": 32000,
+          "max": 32000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "NEW": {
+          "avg": 210000,
+          "min": 210000,
+          "max": 210000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "Otros": {
+          "avg": 39334,
+          "min": 12292,
+          "max": 86233,
+          "count": 8,
+          "n_up": 0,
+          "n_down": 3,
+          "n_new": 2
+        },
+        "TI": {
+          "avg": 19007,
+          "min": 19007,
+          "max": 19007,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "Tiggo 2": {
+          "avg": 4475869,
+          "min": 20500,
+          "max": 20855000,
+          "count": 9,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 3
+        },
+        "Tiggo 3": {
+          "avg": 16063333,
+          "min": 15490000,
+          "max": 16800000,
+          "count": 3,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 2
+        },
+        "Tiggo 4": {
+          "avg": 7275002,
+          "min": 18500,
+          "max": 46210000,
+          "count": 55,
+          "n_up": 0,
+          "n_down": 5,
+          "n_new": 13
+        },
+        "Tiggo 7": {
+          "avg": 28521,
+          "min": 25000,
+          "max": 31900,
+          "count": 12,
+          "n_up": 3,
+          "n_down": 0,
+          "n_new": 4
+        },
+        "Tiggo 8": {
+          "avg": 3452827,
+          "min": 15900,
+          "max": 60500000,
+          "count": 58,
+          "n_up": 0,
+          "n_down": 8,
+          "n_new": 18
+        }
+      }
+    },
+    "BAIC": {
+      "total": 308,
+      "models": {
+        "BJ30": {
+          "avg": 36049,
+          "min": 26000,
+          "max": 40900,
+          "count": 98,
+          "n_up": 7,
+          "n_down": 2,
+          "n_new": 39
+        },
+        "BJ40": {
+          "avg": 53800,
+          "min": 53800,
+          "max": 53800,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "BJ60": {
+          "avg": 75219,
+          "min": 63000,
+          "max": 78600,
+          "count": 23,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 23
+        },
+        "EU5": {
+          "avg": 1043600,
+          "min": 25200,
+          "max": 36615000,
+          "count": 36,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 2
+        },
+        "U5": {
+          "avg": 3009840,
+          "min": 20900,
+          "max": 36500000,
+          "count": 48,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 9
+        },
+        "X25": {
+          "avg": 6367800,
+          "min": 11500,
+          "max": 16300000,
+          "count": 5,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 1
+        },
+        "X35": {
+          "avg": 838637,
+          "min": 13500,
+          "max": 39000000,
+          "count": 48,
+          "n_up": 0,
+          "n_down": 4,
+          "n_new": 6
+        },
+        "X55": {
+          "avg": 1035895,
+          "min": 29000,
+          "max": 49000000,
+          "count": 49,
+          "n_up": 1,
+          "n_down": 1,
+          "n_new": 18
+        }
+      }
+    }
+  },
+  "2026-05-21": {
+    "Chery": {
+      "total": 263,
+      "models": {
+        "3": {
+          "avg": 20185,
+          "min": 20185,
+          "max": 20185,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 1
+        },
+        "7": {
+          "avg": 28900,
+          "min": 28900,
+          "max": 28900,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "Arrizo 6": {
+          "avg": 63680,
+          "min": 26311,
+          "max": 101048,
+          "count": 2,
+          "n_up": 1,
+          "n_down": 1,
+          "n_new": 0
+        },
+        "Arrizo 8": {
+          "avg": 4124556,
+          "min": 14500,
+          "max": 50937000,
+          "count": 62,
+          "n_up": 8,
+          "n_down": 1,
+          "n_new": 9
+        },
+        "CHERY": {
+          "avg": 32000,
+          "min": 32000,
+          "max": 32000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "NEW": {
+          "avg": 210000,
+          "min": 210000,
+          "max": 210000,
+          "count": 1,
+          "n_up": 0,
+          "n_down": 0,
+          "n_new": 0
+        },
+        "Otros": {
+          "avg": 39249,
+          "min": 14804,
+          "max": 84455,
+          "count": 8,
+          "n_up": 6,
+          "n_down": 2,
+          "n_new": 0
+        },
+        "Tiggo 2": {
+          "avg": 2657905,
+          "min": 20500,
+          "max": 20855000,
+          "count": 8,
+          "n_up": 0,
+          "n_down": 1,
+          "n_new": 1
+        },
+        "Tiggo 4": {
+          "avg": 4600107,
+          "min": 14500,
+          "max": 46210000,
+          "count": 62,
+          "n_up": 0,
+          "n_down": 7,
+          "n_new": 26
+        },
+        "Tiggo 7": {
+          "avg": 2612862,
+          "min": 19240,
+          "max": 43050000,
+          "count": 61,
+          "n_up": 0,
+          "n_down": 4,
+          "n_new": 49
+        },
+        "Tiggo 8": {
+          "avg": 3679254,
+          "min": 14211,
+          "max": 64580000,
+          "count": 56,
+          "n_up": 17,
+          "n_down": 5,
+          "n_new": 11
+        }
+      }
+    },
+    "BAIC": {
+      "total": 0,
+      "models": {}
+    }
+  },
+  "2026-05-25": {
+    "Chery": {
+      "total": 0,
+      "models": {}
+    },
+    "BAIC": {
+      "total": 0,
+      "models": {}
+    }
+  },
   "2026-05-29": {
     "Chery": {
       "total": 48,
@@ -286,130 +1038,6 @@
           "n_new": 48
         }
       }
-    }
-  },
-  "2026-06-21": {
-    "Chery": {
-      "total": 212,
-      "models": {
-        "Arrizo 8": {
-          "avg": 7052212,
-          "min": 19800,
-          "max": 51900000,
-          "count": 49,
-          "n_up": 1,
-          "n_down": 1,
-          "n_new": 5
-        },
-        "CHERY": {
-          "avg": 32000,
-          "min": 32000,
-          "max": 32000,
-          "count": 1,
-          "n_up": 0,
-          "n_down": 0,
-          "n_new": 0
-        },
-        "Tiggo 2": {
-          "avg": 23263,
-          "min": 22500,
-          "max": 23830,
-          "count": 3,
-          "n_up": 0,
-          "n_down": 0,
-          "n_new": 0
-        },
-        "Tiggo 3": {
-          "avg": 15050000,
-          "min": 15050000,
-          "max": 15050000,
-          "count": 1,
-          "n_up": 0,
-          "n_down": 0,
-          "n_new": 1
-        },
-        "Tiggo 4": {
-          "avg": 5398553,
-          "min": 24000,
-          "max": 46210000,
-          "count": 66,
-          "n_up": 3,
-          "n_down": 7,
-          "n_new": 14
-        },
-        "Tiggo 7": {
-          "avg": 5584551,
-          "min": 24921,
-          "max": 45000000,
-          "count": 61,
-          "n_up": 1,
-          "n_down": 10,
-          "n_new": 12
-        },
-        "Tiggo 8": {
-          "avg": 7618314,
-          "min": 26500,
-          "max": 60500000,
-          "count": 31,
-          "n_up": 2,
-          "n_down": 0,
-          "n_new": 1
-        }
-      }
-    },
-    "BAIC": {
-      "total": 0,
-      "models": {}
-    }
-  },
-  "2026-06-25": {
-    "Chery": {
-      "total": 0,
-      "models": {}
-    },
-    "BAIC": {
-      "total": 0,
-      "models": {}
-    }
-  },
-  "2026-06-29": {
-    "Chery": {
-      "total": 0,
-      "models": {}
-    },
-    "BAIC": {
-      "total": 0,
-      "models": {}
-    }
-  },
-  "2026-07-01": {
-    "Chery": {
-      "total": 0,
-      "models": {}
-    },
-    "BAIC": {
-      "total": 0,
-      "models": {}
-    }
-  },
-  "2026-07-05": {
-    "Chery": {
-      "total": 0,
-      "models": {}
-    },
-    "BAIC": {
-      "total": 0,
-      "models": {}
-    }
-  },
-  "2026-07-09": {
-    "Chery": {
-      "total": 0,
-      "models": {}
-    },
-    "BAIC": {
-      "total": 0,
-      "models": {}
     }
   }
 }

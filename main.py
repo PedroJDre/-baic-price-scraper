@@ -86,6 +86,12 @@ def load_previous_prices(prices_file):
 def save_current_prices(items, prices_file):
     """Save current listings' prices to the given file."""
     full_path = os.path.join(os.path.dirname(__file__), prices_file)
+    if not items:
+        raise ValueError(
+            f"Refusing to overwrite {full_path} with 0 listings. "
+            "Check scraper API credits/auth before publishing a new run."
+        )
+
     prices = {}
     for item in items:
         prices[item["url"]] = {
@@ -2083,6 +2089,18 @@ def main():
             except Exception as e:
                 print(f"ERROR al obtener publicaciones de {brand_name}: {e}")
                 items = []
+
+            if not items:
+                print(
+                    f"[{brand_name}] ERROR: fresh scrape returned 0 listings. "
+                    "Aborting before saving JSON/history/report/email so the "
+                    "last valid published data is preserved."
+                )
+                print(
+                    "Check scraper API credits/auth, MercadoLibre captcha blocks, "
+                    "Apify access, and Supabase URL/DNS configuration."
+                )
+                sys.exit(2)
 
             previous_prices = load_previous_prices(brand_config["prices_file"])
             compute_price_changes(items, previous_prices)
