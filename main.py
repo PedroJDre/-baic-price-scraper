@@ -356,7 +356,7 @@ def fetch_page(url, retries=2):
     4xx auth/credit errors skip retries immediately — retrying won't help.
     """
     # Status codes that indicate a credential/credit problem — never retry these.
-    NO_RETRY_CODES = {401, 402, 403, 422, 429}
+    NO_RETRY_CODES = {400, 401, 402, 403, 422, 429}
 
     scrapers = []
     if SCRAPINGBEE_API_KEY:
@@ -419,10 +419,18 @@ def fetch_page(url, retries=2):
                     break  # Skip retries, move to next scraper immediately
                 if attempt < retries:
                     wait = attempt * 5
-                    print(f"  [{name}] intento {attempt} fallo: {e} — reintentando en {wait}s...")
+                    detail = _safe_response_snippet(e.response)
+                    print(
+                        f"  [{name}] intento {attempt} fallo: {e}. "
+                        f"API response: {detail} — reintentando en {wait}s..."
+                    )
                     time.sleep(wait)
                 else:
-                    print(f"  [{name}] fallo definitivo: {e} — probando siguiente scraper...")
+                    detail = _safe_response_snippet(e.response)
+                    print(
+                        f"  [{name}] fallo definitivo: {e}. "
+                        f"API response: {detail} — probando siguiente scraper..."
+                    )
             except requests.RequestException as e:
                 last_exc = e
                 if attempt < retries:
