@@ -135,6 +135,37 @@ def build_page_url(page_number, base_url):
     return f"{base_url}_Desde_{offset}"
 
 
+def _safe_response_snippet(response, max_chars=350):
+    """Return a compact API error body without leaking tokens or long IDs."""
+    if response is None:
+        return "no response body"
+
+    text = getattr(response, "text", "") or ""
+    if not text:
+        return "empty response body"
+
+    try:
+        parsed = response.json()
+        text = json.dumps(parsed, ensure_ascii=False)
+    except Exception:
+        pass
+
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    text = re.sub(
+        r"([?&](?:api_key|apikey|token|access_token|key|x-api-key|password)=)[^&\s\"']+",
+        r"\1***",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(r"[\w.\-+]+@[\w.\-]+\.\w+", "***@***", text)
+    text = re.sub(r"\b[A-Za-z0-9_\-]{32,}\b", "***", text)
+
+    if len(text) > max_chars:
+        return text[:max_chars].rstrip() + "..."
+    return text
+
+
 def _scraperapi_request(url, use_wait_for_selector=True):
     """Make a single ScraperAPI request. Returns response object."""
     params = {
@@ -380,7 +411,11 @@ def fetch_page(url, retries=2):
                 last_exc = e
                 status = e.response.status_code if e.response is not None else 0
                 if status in NO_RETRY_CODES:
-                    print(f"  [{name}] {status} — sin creditos/auth, saltando...")
+                    detail = _safe_response_snippet(e.response)
+                    print(
+                        f"  [{name}] {status} - auth/credits/quota, "
+                        f"saltando. API response: {detail}"
+                    )
                     break  # Skip retries, move to next scraper immediately
                 if attempt < retries:
                     wait = attempt * 5
@@ -787,6 +822,14 @@ def fetch_via_apify(apify_keywords):
 
             print(f"    {len(items)} resultados, {new_count} nuevos")
 
+        except requests.HTTPError as e:
+            response = e.response
+            status = response.status_code if response is not None else 0
+            detail = _safe_response_snippet(response)
+            print(
+                f"    HTTP {status} para '{keyword}': {detail}"
+            )
+            continue
         except Exception as e:
             print(f"    Error para '{keyword}': {e}")
             continue
@@ -2061,8 +2104,37 @@ def _load_today_from_supabase(brand_name, run_date_str):
         return None, None
 
 
+def run_scraper_diagnostics():
+    """Print scraper provider responses without saving data or sending email."""
+    print("Running scraper diagnostics only. No files, Supabase rows, or emails will be written.")
+    for brand_name, brand_config in BRANDS.items():
+        print(f"\n{'=' * 50}")
+        print(f"Diagnosing: {brand_name}")
+        print(f"{'=' * 50}")
+
+        try:
+            fetch_page(brand_config["base_url"], retries=1)
+            print(f"[{brand_name}] HTML scraper chain returned a valid MercadoLibre page.")
+        except requests.RequestException as e:
+            response = getattr(e, "response", None)
+            status = response.status_code if response is not None else 0
+            detail = _safe_response_snippet(response)
+            print(f"[{brand_name}] HTML scraper chain failed. HTTP {status}: {detail}")
+
+        keywords = brand_config.get("apify_keywords", [])
+        if APIFY_API_TOKEN and keywords:
+            print(f"[{brand_name}] Apify diagnostic using first keyword only: {keywords[0]}")
+            fetch_via_apify(keywords[:1])
+        else:
+            print(f"[{brand_name}] Apify not configured or no keywords available.")
+
+
 def main():
     print(f"Iniciando scraper - {datetime.now()}")
+
+    if os.environ.get("SCRAPER_DIAGNOSTICS_ONLY", "").lower() == "true":
+        run_scraper_diagnostics()
+        return
 
     history = load_history()
     today = datetime.now().strftime("%Y-%m-%d")

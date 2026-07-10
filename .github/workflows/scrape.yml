@@ -4,7 +4,13 @@ on:
   schedule:
     # Every 4 days at 12:00 UTC (9:00 AM Argentina time, GMT-3)
     - cron: '0 12 */4 * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      diagnostics:
+        description: 'Only print scraper API diagnostics; do not save data or send email'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -46,9 +52,11 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SCRAPER_DIAGNOSTICS_ONLY: ${{ inputs.diagnostics }}
         run: python main.py
 
       - name: Save price history
+        if: ${{ inputs.diagnostics != true }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
