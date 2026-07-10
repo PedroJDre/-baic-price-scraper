@@ -7,6 +7,7 @@ import smtplib
 import ssl
 from datetime import datetime
 from difflib import get_close_matches, SequenceMatcher
+from html import escape
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from urllib.parse import urlencode
@@ -1049,19 +1050,76 @@ def process_listings(items, known_models, brand_name):
 
 def _format_price(entry):
     """Format a listing's price as a display string."""
-    if entry["currency"] in ("U$S", "US$"):
-        return f"USD {entry['price']:,}".replace(",", ".")
-    return f"${entry['price']:,}".replace(",", ".")
+    return _format_price_value(entry.get("price", 0), _currency_key(entry))
+
+
+def _is_usd_currency(currency):
+    """Return True when a scraped currency value means US dollars."""
+    return str(currency or "").upper() in ("U$S", "US$", "USD")
+
+
+def _currency_key(entry):
+    return "USD" if _is_usd_currency(entry.get("currency")) else "ARS"
+
+
+def _format_price_value(price, currency_key):
+    value = f"{int(round(price)):,}".replace(",", ".")
+    if currency_key == "USD":
+        return f"USD {value}"
+    return f"${value}"
+
+
+def _dominant_price_stats(entries):
+    """Compute price stats without mixing ARS and USD."""
+    buckets = {"USD": [], "ARS": []}
+    for entry in entries:
+        price = entry.get("price", 0) or 0
+        if price > 0:
+            buckets[_currency_key(entry)].append(price)
+
+    non_empty = {currency: values for currency, values in buckets.items() if values}
+    if not non_empty:
+        return {
+            "avg": None,
+            "min": None,
+            "max": None,
+            "currency": "",
+            "count": 0,
+            "ignored_currency_count": 0,
+            "avg_label": "-",
+            "range_label": "-",
+        }
+
+    currency = max(non_empty, key=lambda key: (len(non_empty[key]), key == "USD"))
+    values = non_empty[currency]
+    ignored = sum(len(v) for k, v in non_empty.items() if k != currency)
+    avg = round(sum(values) / len(values))
+    lo = min(values)
+    hi = max(values)
+    return {
+        "avg": avg,
+        "min": lo,
+        "max": hi,
+        "currency": currency,
+        "count": len(values),
+        "ignored_currency_count": ignored,
+        "avg_label": _format_price_value(avg, currency),
+        "range_label": (
+            f"{_format_price_value(lo, currency)} - "
+            f"{_format_price_value(hi, currency)}"
+        ),
+    }
+
+
+def _is_dealer_listing(entry):
+    seller = str(entry.get("seller") or "").strip().lower()
+    return bool(seller and seller not in ("particular", "n/a", "na", "sin datos"))
 
 
 def _price_range_str(entries):
     """Return a 'min - max' price range string for a group of entries."""
-    prices = [e for e in entries if e["price"] > 0]
-    if not prices:
-        return ""
-    lo = min(prices, key=lambda x: x["price"])
-    hi = max(prices, key=lambda x: x["price"])
-    return f"{_format_price(lo)} \u2014 {_format_price(hi)}"
+    stats = _dominant_price_stats(entries)
+    return "" if stats["count"] == 0 else stats["range_label"]
 
 
 def format_plain_text(results_by_brand, summaries_by_brand=None):
@@ -1314,7 +1372,7 @@ def _build_brand_html_section(brand_name, grouped, brand_config, summary=""):
     )
 
 
-def format_html_email(results_by_brand, summaries_by_brand=None):
+def _format_html_email_legacy(results_by_brand, summaries_by_brand=None):
     """Short briefing email with KPIs per brand and a CTA to the full interactive report."""
     summaries_by_brand = summaries_by_brand or {}
     date_str = datetime.now().strftime('%d/%m/%Y %H:%M')
@@ -1415,6 +1473,207 @@ def format_html_email(results_by_brand, summaries_by_brand=None):
     )
 
 
+def format_html_email(results_by_brand, summaries_by_brand=None):
+    """Build an email briefing focused on model pricing decisions."""
+    summaries_by_brand = summaries_by_brand or {}
+    date_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    def h(value):
+        return escape(str(value or ""), quote=True)
+
+    def signal_for_model(stats):
+        dealer_avg = stats.get("dealer_avg")
+        dealer_currency = stats.get("dealer_currency")
+        private_avg = stats.get("private_avg")
+        private_currency = stats.get("private_currency")
+
+        if dealer_avg and private_avg and dealer_currency == private_currency:
+            base_label = "Particulares"
+            diff_pct = ((private_avg - dealer_avg) / dealer_avg) * 100
+        elif dealer_avg and stats.get("avg") and dealer_currency == stats.get("currency"):
+            base_label = "ML"
+            diff_pct = ((stats["avg"] - dealer_avg) / dealer_avg) * 100
+        else:
+            return (
+                '<span style="color:#6b7280;font-weight:700;">Sin referencia</span>',
+                "#6b7280",
+            )
+
+        if diff_pct >= 5:
+            text = f"{base_label} +{diff_pct:.1f}% vs concesionarias"
+            return (h(text), "#b91c1c")
+        if diff_pct <= -5:
+            text = f"{base_label} {diff_pct:.1f}% vs concesionarias"
+            return (h(text), "#15803d")
+        text = f"{base_label} alineado ({diff_pct:+.1f}%)"
+        return (h(text), "#374151")
+
+    def movement_text(stats):
+        parts = []
+        if stats.get("n_up"):
+            parts.append(f"+{stats['n_up']} subieron")
+        if stats.get("n_down"):
+            parts.append(f"-{stats['n_down']} bajaron")
+        if stats.get("n_new"):
+            parts.append(f"{stats['n_new']} nuevas")
+        return ", ".join(parts) if parts else "sin cambios"
+
+    total_all = sum(
+        len(entries)
+        for grouped in results_by_brand.values()
+        for entries in grouped.values()
+    )
+    total_models = sum(len(grouped) for grouped in results_by_brand.values())
+
+    if not total_all:
+        return (
+            '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"></head>'
+            '<body style="margin:0;padding:0;background:#f3f4f6;'
+            'font-family:Arial,Helvetica,sans-serif;">'
+            '<table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;">'
+            '<tr><td align="center"><table width="680" cellpadding="0" cellspacing="0" '
+            'style="background:#ffffff;border:1px solid #e5e7eb;">'
+            '<tr><td style="padding:28px;text-align:center;">'
+            '<h1 style="margin:0 0 8px;font-size:22px;color:#111827;">Reporte Mercado Libre</h1>'
+            '<p style="margin:0;font-size:14px;color:#6b7280;">No se encontraron publicaciones.</p>'
+            '</td></tr></table></td></tr></table></body></html>'
+        )
+
+    brand_blocks = []
+    for brand_name, grouped in results_by_brand.items():
+        brand_config = BRANDS.get(brand_name, {})
+        color = brand_config.get("header_color", "#1f2937")
+        all_items = [e for entries in grouped.values() for e in entries]
+        stats = _compute_brand_stats(brand_name, grouped, all_items)
+        models = stats.get("models", {})
+        dealer_total = sum(model.get("dealer_count", 0) for model in models.values())
+        private_total = sum(model.get("private_count", 0) for model in models.values())
+
+        summary = summaries_by_brand.get(brand_name, "")
+        summary_html = ""
+        if summary:
+            summary_html = (
+                '<tr><td style="padding:0 24px 18px;">'
+                f'<div style="border-left:4px solid {color};background:#f9fafb;'
+                'padding:13px 16px;font-size:13px;line-height:20px;color:#374151;">'
+                f'{h(summary)}</div></td></tr>'
+            )
+
+        rows = []
+        for model, model_stats in sorted(
+            models.items(), key=lambda item: item[1].get("count", 0), reverse=True
+        ):
+            signal_text, signal_color = signal_for_model(model_stats)
+            ignored = model_stats.get("ignored_currency_count", 0)
+            ignored_note = (
+                f'<div style="font-size:11px;color:#9ca3af;margin-top:3px;">'
+                f'{ignored} pub. en otra moneda fuera del promedio</div>'
+                if ignored else ""
+            )
+            rows.append(
+                '<tr>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;">'
+                f'<div style="font-size:13px;color:#111827;font-weight:800;">{h(model)}</div>'
+                f'<div style="font-size:11px;color:#6b7280;margin-top:3px;">'
+                f'{model_stats.get("count", 0)} pub. total &bull; '
+                f'{model_stats.get("dealer_count", 0)} concesionarias &bull; '
+                f'{model_stats.get("private_count", 0)} particulares</div>'
+                f'{ignored_note}'
+                '</td>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;'
+                'text-align:right;white-space:nowrap;">'
+                f'<div style="font-size:13px;color:#111827;font-weight:800;">'
+                f'{h(model_stats.get("private_avg_label", "-"))}</div>'
+                f'<div style="font-size:11px;color:#6b7280;margin-top:3px;">particulares ML</div>'
+                '</td>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;'
+                'text-align:right;white-space:nowrap;">'
+                f'<div style="font-size:13px;color:#111827;font-weight:800;">'
+                f'{h(model_stats.get("dealer_avg_label", "-"))}</div>'
+                f'<div style="font-size:11px;color:#6b7280;margin-top:3px;">concesionarias ML</div>'
+                '</td>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;'
+                'text-align:right;">'
+                f'<div style="font-size:13px;color:{signal_color};font-weight:800;">{signal_text}</div>'
+                f'<div style="font-size:11px;color:#6b7280;margin-top:3px;">'
+                f'{h(movement_text(model_stats))}</div>'
+                '</td></tr>'
+            )
+
+        brand_blocks.append(
+            '<tr><td style="padding:24px 24px 8px;">'
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="background:{color};">'
+            '<tr><td style="padding:18px 20px;">'
+            f'<div style="font-size:20px;line-height:24px;color:#ffffff;font-weight:800;">{h(brand_name)}</div>'
+            '<div style="margin-top:5px;font-size:12px;line-height:16px;color:rgba(255,255,255,.84);">'
+            f'{stats.get("total", 0)} publicaciones &bull; {len(models)} modelos &bull; '
+            f'{dealer_total} concesionarias &bull; {private_total} particulares'
+            '</div></td></tr></table></td></tr>'
+            f'{summary_html}'
+            '<tr><td style="padding:0 24px 24px;">'
+            '<table width="100%" cellpadding="0" cellspacing="0" '
+            'style="border-collapse:collapse;border:1px solid #e5e7eb;">'
+            '<tr style="background:#f9fafb;">'
+            '<th align="left" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Modelo</th>'
+            '<th align="right" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Particulares</th>'
+            '<th align="right" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Concesionarias</th>'
+            '<th align="right" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Senal</th>'
+            '</tr>'
+            f'{"".join(rows)}'
+            '</table></td></tr>'
+        )
+
+    preheader = (
+        f"Reporte ML: {total_all} publicaciones, {total_models} modelos, "
+        "comparativo particulares vs concesionarias."
+    )
+
+    return (
+        '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1.0"></head>'
+        '<body style="margin:0;padding:0;background:#eef2f7;'
+        'font-family:Arial,Helvetica,sans-serif;color:#111827;">'
+        f'<div style="display:none;max-height:0;overflow:hidden;opacity:0;">{h(preheader)}</div>'
+        '<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:24px 0;">'
+        '<tr><td align="center">'
+        '<table width="720" cellpadding="0" cellspacing="0" '
+        'style="background:#ffffff;border:1px solid #dbe3ee;">'
+        '<tr><td style="background:#111827;padding:24px 28px;">'
+        '<div style="font-size:23px;line-height:28px;color:#ffffff;font-weight:800;">'
+        'Benchmark de precios por modelo</div>'
+        f'<div style="margin-top:6px;font-size:13px;line-height:18px;color:#cbd5e1;">'
+        f'Mercado Libre vs concesionarias &bull; {h(date_str)} &bull; '
+        f'{total_all} publicaciones</div>'
+        '</td></tr>'
+        '<tr><td style="padding:18px 24px 0;">'
+        '<div style="background:#f8fafc;border:1px solid #e5e7eb;padding:14px 16px;'
+        'font-size:13px;line-height:20px;color:#374151;">'
+        '<strong>Como leerlo:</strong> si particulares ML estan arriba de concesionarias, '
+        'hay margen para revisar precios hacia arriba. Si estan abajo, revisar competitividad '
+        'por modelo antes de ajustar.</div>'
+        '</td></tr>'
+        f'{"".join(brand_blocks)}'
+        '<tr><td style="padding:4px 24px 30px;text-align:center;">'
+        f'<a href="{h(GITHUB_PAGES_URL)}" target="_blank" '
+        'style="display:inline-block;background:#111827;color:#ffffff;'
+        'text-decoration:none;font-size:15px;font-weight:800;'
+        'padding:14px 26px;border-radius:5px;">Ver detalle completo</a>'
+        '<div style="margin-top:10px;font-size:12px;line-height:16px;color:#6b7280;">'
+        'Incluye busqueda, filtros por modelo, publicaciones y evolucion historica.</div>'
+        '</td></tr>'
+        '<tr><td style="background:#f9fafb;padding:16px 24px;text-align:center;'
+        'border-top:1px solid #e5e7eb;">'
+        '<p style="margin:0;font-size:11px;line-height:16px;color:#6b7280;">'
+        'Promedios calculados por moneda principal del modelo; no se mezclan pesos y dolares.</p>'
+        '</td></tr>'
+        '</table></td></tr></table></body></html>'
+    )
+
+
 def load_history():
     """Load the accumulated run history from data/history.json."""
     full_path = os.path.join(os.path.dirname(__file__), HISTORY_FILE)
@@ -1442,13 +1701,32 @@ def _compute_brand_stats(brand_name, grouped, items):
     """Compute per-model and total stats for one brand run."""
     models = {}
     for model, entries in grouped.items():
-        prices = [e["price"] for e in entries if e.get("price", 0) > 0]
-        if not prices:
+        price_stats = _dominant_price_stats(entries)
+        if not price_stats["count"]:
             continue
+        dealer_entries = [e for e in entries if _is_dealer_listing(e)]
+        private_entries = [e for e in entries if not _is_dealer_listing(e)]
+        dealer_stats = _dominant_price_stats(dealer_entries)
+        private_stats = _dominant_price_stats(private_entries)
         models[model] = {
-            "avg": round(sum(prices) / len(prices)),
-            "min": min(prices),
-            "max": max(prices),
+            "avg": price_stats["avg"],
+            "min": price_stats["min"],
+            "max": price_stats["max"],
+            "currency": price_stats["currency"],
+            "avg_label": price_stats["avg_label"],
+            "range_label": price_stats["range_label"],
+            "price_count": price_stats["count"],
+            "ignored_currency_count": price_stats["ignored_currency_count"],
+            "dealer_count": len(dealer_entries),
+            "private_count": len(entries) - len(dealer_entries),
+            "dealer_avg": dealer_stats["avg"],
+            "dealer_currency": dealer_stats["currency"],
+            "dealer_avg_label": dealer_stats["avg_label"],
+            "dealer_range_label": dealer_stats["range_label"],
+            "private_avg": private_stats["avg"],
+            "private_currency": private_stats["currency"],
+            "private_avg_label": private_stats["avg_label"],
+            "private_range_label": private_stats["range_label"],
             "count": len(entries),
             "n_up": sum(1 for e in entries if e.get("price_change") == "up"),
             "n_down": sum(1 for e in entries if e.get("price_change") == "down"),
@@ -1484,8 +1762,10 @@ def generate_brand_summary(brand_name, grouped, items, history):
     for model, s in stats["models"].items():
         model_lines.append(
             f"  - {model}: {s['count']} pub., "
-            f"promedio {fmt_price(s['avg'])}, "
-            f"rango {fmt_price(s['min'])}–{fmt_price(s['max'])}, "
+            f"promedio ML {s.get('avg_label') or fmt_price(s['avg'])}, "
+            f"rango {s.get('range_label') or (fmt_price(s['min']) + '-' + fmt_price(s['max']))}, "
+            f"concesionarias {s.get('dealer_count', 0)} pub. "
+            f"promedio {s.get('dealer_avg_label', '-')}, "
             f"{s['n_up']} subieron / {s['n_down']} bajaron / {s['n_new']} nuevas"
         )
     current_block = f"Total: {stats['total']} publicaciones\n" + "\n".join(model_lines)
@@ -1504,7 +1784,10 @@ def generate_brand_summary(brand_name, grouped, items, history):
         for date, h_stats in past_runs:
             h_models = []
             for model, s in h_stats.get("models", {}).items():
-                h_models.append(f"{model}: promedio {fmt_price(s['avg'])} ({s['count']} pub.)")
+                h_models.append(
+                    f"{model}: promedio {s.get('avg_label') or fmt_price(s['avg'])} "
+                    f"({s['count']} pub.)"
+                )
             history_lines.append(f"  {date}: " + ", ".join(h_models))
         history_block = "\nHISTORIAL RECIENTE (últimas corridas):\n" + "\n".join(history_lines)
     else:
@@ -1513,6 +1796,7 @@ def generate_brand_summary(brand_name, grouped, items, history):
     prompt = (
         f"Resumí en exactamente 2-3 oraciones cortas los datos de {brand_name} en Mercado Libre Argentina. "
         f"Sé directo y factual: mencioná el total de publicaciones, qué modelos lideran en volumen, "
+        f"cómo está el promedio de Mercado Libre frente a concesionarias por modelo, "
         f"y si hubo subas/bajas de precio relevantes respecto al historial. "
         f"Si no hay historial o no hubo cambios de precio, decilo en una frase y no especules. "
         f"Nada de bullet points, títulos ni análisis especulativos. Solo los hechos.\n\n"
@@ -1638,6 +1922,11 @@ function fmtPrice(item) {
   return (item.currency === 'U$S' || item.currency === 'US$') ? 'USD ' + n : '$' + n;
 }
 function fmtNum(n) { return n ? n.toLocaleString('es-AR') : '0'; }
+function fmtValueByCurrency(value, currency) {
+  if (!value) return '—';
+  const n = Number(value).toLocaleString('es-AR');
+  return currency === 'USD' ? 'USD ' + n : '$' + n;
+}
 
 /* --- Tabs --- */
 function renderTabs() {
@@ -1684,11 +1973,13 @@ function renderSummary(brand) {
 /* --- Chart --- */
 function renderChart(brandName) {
   const hist = HISTORY[brandName] || {};
-  const models = Object.keys(hist);
+  const models = Object.keys(hist).filter(m =>
+    (hist[m] || []).some(d => d.currency || d.avg_label)
+  );
   if (!models.length) return '';
   const opts = models.map(m => '<option value="'+m+'">'+m+'</option>').join('');
   return '<div class="chart-card"><div class="chart-header">' +
-    '<span class="chart-title">Evolución de Precio Promedio</span>' +
+    '<span class="chart-title">Evolución de precio promedio (moneda principal)</span>' +
     '<select class="chart-model-select" id="chartModelSel" onchange="updateChart()">' + opts + '</select>' +
     '</div><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>';
 }
@@ -1697,11 +1988,12 @@ function updateChart() {
   const hist = HISTORY[state.brand] || {};
   const sel = document.getElementById('chartModelSel');
   if (!sel) return;
-  const data = hist[sel.value] || [];
+  const data = (hist[sel.value] || []).filter(d => d.currency || d.avg_label);
   if (state.chart) { state.chart.destroy(); state.chart = null; }
   const ctx = document.getElementById('trendChart');
   if (!ctx || !data.length) return;
   const color = DATA[state.brand].color;
+  const currency = (data.find(d => d.currency) || {}).currency || '';
   state.chart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -1722,10 +2014,18 @@ function updateChart() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: {
-        callbacks: { label: ctx => '$' + ctx.parsed.y.toLocaleString('es-AR') }
+        callbacks: {
+          label: ctx => {
+            const point = data[ctx.dataIndex] || {};
+            return point.avg_label || fmtValueByCurrency(ctx.parsed.y, point.currency || currency);
+          }
+        }
       }},
       scales: {
-        y: { ticks: { callback: v => '$' + (v/1e6).toFixed(1)+'M', font:{size:11} }, grid:{color:'#f1f5f9'} },
+        y: { ticks: {
+          callback: v => currency === 'USD' ? 'USD ' + (v/1000).toFixed(0)+'k' : '$' + (v/1e6).toFixed(1)+'M',
+          font:{size:11}
+        }, grid:{color:'#f1f5f9'} },
         x: { ticks: { font:{size:11} }, grid:{display:false} }
       }
     }
@@ -1890,6 +2190,8 @@ def generate_interactive_report(results_by_brand, summaries_by_brand, history):
                 hist_payload[brand_name].setdefault(model, []).append({
                     "date": date,
                     "avg": mstats.get("avg", 0),
+                    "currency": mstats.get("currency", ""),
+                    "avg_label": mstats.get("avg_label", ""),
                     "count": mstats.get("count", 0),
                 })
 
