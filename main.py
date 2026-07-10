@@ -205,7 +205,6 @@ def _scrapingant_request(url):
         "url": url,
         "browser": "true",
         "wait": "5000",
-        "proxy_country": "AR",
     }
     return requests.get(SCRAPINGANT_URL, params=params, timeout=120)
 
@@ -236,7 +235,6 @@ def _crawlbase_request(url):
     params = {
         "token": CRAWLBASE_TOKEN,
         "url": url,
-        "country": "AR",
         "wait": "5000",
     }
     return requests.get(CRAWLBASE_URL, params=params, timeout=120)
