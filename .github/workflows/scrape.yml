@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
       - name: Run scraper
         env:
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
@@ -52,6 +55,9 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          OWN_SELLER_KEYWORDS: ${{ vars.OWN_SELLER_KEYWORDS }}
+          OWN_SELLER_KEYWORDS_BAIC: ${{ vars.OWN_SELLER_KEYWORDS_BAIC }}
+          OWN_SELLER_KEYWORDS_CHERY: ${{ vars.OWN_SELLER_KEYWORDS_CHERY }}
           SCRAPER_DIAGNOSTICS_ONLY: ${{ inputs.diagnostics }}
         run: python main.py
 

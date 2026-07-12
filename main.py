@@ -66,6 +66,7 @@ from config import (
     HISTORY_MAX_ENTRIES,
     REPORT_FILE,
     GITHUB_PAGES_URL,
+    OWN_SELLER_KEYWORDS,
     SUPABASE_URL,
     SUPABASE_KEY,
 )
@@ -1116,6 +1117,26 @@ def _is_dealer_listing(entry):
     return bool(seller and seller not in ("particular", "n/a", "na", "sin datos"))
 
 
+def _seller_key(value):
+    return re.sub(r"\s+", " ", str(value or "").strip().lower())
+
+
+def _own_seller_keywords_for_brand(brand_name):
+    if isinstance(OWN_SELLER_KEYWORDS, dict):
+        keywords = list(OWN_SELLER_KEYWORDS.get("*", []))
+        keywords.extend(OWN_SELLER_KEYWORDS.get(brand_name, []))
+    else:
+        keywords = list(OWN_SELLER_KEYWORDS or [])
+    return [_seller_key(keyword) for keyword in keywords if _seller_key(keyword)]
+
+
+def _is_own_listing(entry, brand_name):
+    seller = _seller_key(entry.get("seller"))
+    if not seller:
+        return False
+    return any(keyword in seller for keyword in _own_seller_keywords_for_brand(brand_name))
+
+
 def _price_range_str(entries):
     """Return a 'min - max' price range string for a group of entries."""
     stats = _dominant_price_stats(entries)
@@ -1473,7 +1494,7 @@ def _format_html_email_legacy(results_by_brand, summaries_by_brand=None):
     )
 
 
-def format_html_email(results_by_brand, summaries_by_brand=None):
+def _format_html_email_market_segments(results_by_brand, summaries_by_brand=None):
     """Build an email briefing focused on model pricing decisions."""
     summaries_by_brand = summaries_by_brand or {}
     date_str = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -1674,6 +1695,266 @@ def format_html_email(results_by_brand, summaries_by_brand=None):
     )
 
 
+def format_html_email(results_by_brand, summaries_by_brand=None):
+    """Build an email briefing focused on our prices vs competitors."""
+    summaries_by_brand = summaries_by_brand or {}
+    date_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    def h(value):
+        return escape(str(value or ""), quote=True)
+
+    def comparison_for_model(stats):
+        own_avg = stats.get("own_avg")
+        own_currency = stats.get("own_currency")
+        benchmark_avg = stats.get("benchmark_avg")
+        benchmark_currency = stats.get("benchmark_currency")
+
+        if not stats.get("own_price_count"):
+            return (
+                "Sin precio propio",
+                "Configurar seller propio para comparar este modelo.",
+                "#6b7280",
+            )
+        if not benchmark_avg:
+            return (
+                "Sin benchmark",
+                "No hay competencia comparable en la moneda principal.",
+                "#6b7280",
+            )
+        if own_currency != benchmark_currency:
+            return (
+                "Moneda distinta",
+                "Comparar manualmente antes de ajustar precio.",
+                "#b45309",
+            )
+
+        diff_pct = ((own_avg - benchmark_avg) / benchmark_avg) * 100
+        if diff_pct <= -5:
+            return (
+                f"Estamos {diff_pct:.1f}% abajo",
+                "Hay margen para subir sin superar a la competencia.",
+                "#047857",
+            )
+        if diff_pct >= 5:
+            return (
+                f"Estamos +{diff_pct:.1f}% arriba",
+                "Revisar precio o propuesta comercial del modelo.",
+                "#b91c1c",
+            )
+        return (
+            f"Alineados ({diff_pct:+.1f}%)",
+            "Mantener precio y monitorear cambios.",
+            "#374151",
+        )
+
+    def movement_text(stats):
+        parts = []
+        if stats.get("n_up"):
+            parts.append(f"+{stats['n_up']} subieron")
+        if stats.get("n_down"):
+            parts.append(f"-{stats['n_down']} bajaron")
+        if stats.get("n_new"):
+            parts.append(f"{stats['n_new']} nuevas")
+        return ", ".join(parts) if parts else "sin cambios"
+
+    def benchmark_listing_count(stats):
+        if stats.get("benchmark_label") == "competencia concesionaria":
+            return stats.get("dealer_competitor_count", 0)
+        return stats.get("competitor_count", 0)
+
+    total_all = sum(
+        len(entries)
+        for grouped in results_by_brand.values()
+        for entries in grouped.values()
+    )
+    total_models = sum(len(grouped) for grouped in results_by_brand.values())
+
+    if not total_all:
+        return (
+            '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"></head>'
+            '<body style="margin:0;padding:0;background:#f3f4f6;'
+            'font-family:Arial,Helvetica,sans-serif;">'
+            '<table width="100%" cellpadding="0" cellspacing="0" style="padding:24px 0;">'
+            '<tr><td align="center"><table width="680" cellpadding="0" cellspacing="0" '
+            'style="background:#ffffff;border:1px solid #e5e7eb;">'
+            '<tr><td style="padding:28px;text-align:center;">'
+            '<h1 style="margin:0 0 8px;font-size:22px;color:#111827;">Reporte Mercado Libre</h1>'
+            '<p style="margin:0;font-size:14px;color:#6b7280;">No se encontraron publicaciones.</p>'
+            '</td></tr></table></td></tr></table></body></html>'
+        )
+
+    brand_blocks = []
+    for brand_name, grouped in results_by_brand.items():
+        brand_config = BRANDS.get(brand_name, {})
+        color = brand_config.get("header_color", "#1f2937")
+        all_items = [e for entries in grouped.values() for e in entries]
+        stats = _compute_brand_stats(brand_name, grouped, all_items)
+        models = stats.get("models", {})
+        own_total = sum(model.get("own_count", 0) for model in models.values())
+        competitor_total = sum(model.get("competitor_count", 0) for model in models.values())
+        dealer_competitor_total = sum(
+            model.get("dealer_competitor_count", 0) for model in models.values()
+        )
+        own_keywords = _own_seller_keywords_for_brand(brand_name)
+        own_label = ", ".join(own_keywords) if own_keywords else "sin sellers propios"
+
+        summary = summaries_by_brand.get(brand_name, "")
+        summary_html = ""
+        if summary:
+            summary_html = (
+                '<tr><td style="padding:0 24px 18px;">'
+                f'<div style="border-left:4px solid {color};background:#f9fafb;'
+                'padding:13px 16px;font-size:13px;line-height:20px;color:#374151;">'
+                f'{h(summary)}</div></td></tr>'
+            )
+
+        rows = []
+        for model, model_stats in sorted(
+            models.items(),
+            key=lambda item: (
+                item[1].get("own_count", 0) > 0,
+                item[1].get("count", 0),
+            ),
+            reverse=True,
+        ):
+            signal_text, signal_detail, signal_color = comparison_for_model(model_stats)
+            ignored = model_stats.get("ignored_currency_count", 0)
+            ignored_note = (
+                f'<div style="font-size:11px;color:#9ca3af;margin-top:3px;">'
+                f'{ignored} pub. en otra moneda fuera del promedio</div>'
+                if ignored else ""
+            )
+            own_has_price = model_stats.get("own_price_count", 0) > 0
+            own_price = model_stats.get("own_avg_label", "-") if own_has_price else "-"
+            own_count = model_stats.get("own_count", 0)
+            own_detail = (
+                f"{own_count} pub. propias"
+                if own_count
+                else "sin publicaciones propias"
+            )
+            benchmark_count = benchmark_listing_count(model_stats)
+            benchmark_label = model_stats.get("benchmark_label", "competencia")
+
+            rows.append(
+                '<tr>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;">'
+                f'<div style="font-size:13px;color:#111827;font-weight:800;">{h(model)}</div>'
+                f'<div style="font-size:11px;color:#6b7280;margin-top:3px;">'
+                f'{model_stats.get("count", 0)} pub. ML &bull; '
+                f'{model_stats.get("dealer_count", 0)} concesionarias</div>'
+                f'{ignored_note}'
+                '</td>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;'
+                'text-align:right;white-space:nowrap;">'
+                f'<div style="font-size:13px;color:#111827;font-weight:800;">{h(own_price)}</div>'
+                f'<div style="font-size:11px;color:#6b7280;margin-top:3px;">{h(own_detail)}</div>'
+                '</td>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;'
+                'text-align:right;white-space:nowrap;">'
+                f'<div style="font-size:13px;color:#111827;font-weight:800;">'
+                f'{h(model_stats.get("benchmark_avg_label", "-"))}</div>'
+                f'<div style="font-size:11px;color:#6b7280;margin-top:3px;">'
+                f'{h(benchmark_label)} &bull; {benchmark_count} pub.</div>'
+                '</td>'
+                '<td style="padding:12px;border-top:1px solid #edf0f3;vertical-align:top;'
+                'text-align:right;">'
+                f'<div style="font-size:13px;color:{signal_color};font-weight:800;">'
+                f'{h(signal_text)}</div>'
+                f'<div style="font-size:11px;color:#374151;margin-top:3px;line-height:15px;">'
+                f'{h(signal_detail)}</div>'
+                f'<div style="font-size:11px;color:#9ca3af;margin-top:4px;">'
+                f'{h(movement_text(model_stats))}</div>'
+                '</td></tr>'
+            )
+
+        if not rows:
+            rows.append(
+                '<tr><td colspan="4" style="padding:16px;border-top:1px solid #edf0f3;'
+                'font-size:13px;color:#6b7280;text-align:center;">'
+                'Sin modelos con precio comparable.</td></tr>'
+            )
+
+        brand_blocks.append(
+            '<tr><td style="padding:24px 24px 8px;">'
+            f'<table width="100%" cellpadding="0" cellspacing="0" style="background:{color};">'
+            '<tr><td style="padding:18px 20px;">'
+            f'<div style="font-size:20px;line-height:24px;color:#ffffff;font-weight:800;">'
+            f'{h(brand_name)}</div>'
+            '<div style="margin-top:5px;font-size:12px;line-height:16px;color:rgba(255,255,255,.84);">'
+            f'{stats.get("total", 0)} publicaciones &bull; {len(models)} modelos &bull; '
+            f'{own_total} propias &bull; {dealer_competitor_total} concesionarias competencia'
+            '</div></td></tr></table></td></tr>'
+            f'{summary_html}'
+            '<tr><td style="padding:0 24px 12px;">'
+            '<div style="font-size:11px;line-height:16px;color:#6b7280;">'
+            f'Sellers propios configurados: {h(own_label)}. '
+            f'Competencia total observada: {competitor_total} publicaciones no propias.'
+            '</div></td></tr>'
+            '<tr><td style="padding:0 24px 24px;">'
+            '<table width="100%" cellpadding="0" cellspacing="0" '
+            'style="border-collapse:collapse;border:1px solid #e5e7eb;">'
+            '<tr style="background:#f9fafb;">'
+            '<th align="left" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Modelo</th>'
+            '<th align="right" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Nosotros</th>'
+            '<th align="right" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Competencia</th>'
+            '<th align="right" style="padding:10px 12px;font-size:11px;color:#6b7280;'
+            'text-transform:uppercase;">Lectura / accion</th>'
+            '</tr>'
+            f'{"".join(rows)}'
+            '</table></td></tr>'
+        )
+
+    preheader = (
+        f"Reporte ML: {total_all} publicaciones, {total_models} modelos, "
+        "nuestros precios vs competencia por modelo."
+    )
+
+    return (
+        '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1.0"></head>'
+        '<body style="margin:0;padding:0;background:#eef2f7;'
+        'font-family:Arial,Helvetica,sans-serif;color:#111827;">'
+        f'<div style="display:none;max-height:0;overflow:hidden;opacity:0;">{h(preheader)}</div>'
+        '<table width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:24px 0;">'
+        '<tr><td align="center">'
+        '<table width="720" cellpadding="0" cellspacing="0" '
+        'style="background:#ffffff;border:1px solid #dbe3ee;">'
+        '<tr><td style="background:#111827;padding:24px 28px;">'
+        '<div style="font-size:23px;line-height:28px;color:#ffffff;font-weight:800;">'
+        'Nosotros vs competencia por modelo</div>'
+        f'<div style="margin-top:6px;font-size:13px;line-height:18px;color:#cbd5e1;">'
+        f'Precios propios contra concesionarias ML &bull; {h(date_str)} &bull; '
+        f'{total_all} publicaciones</div>'
+        '</td></tr>'
+        '<tr><td style="padding:18px 24px 0;">'
+        '<div style="background:#f8fafc;border:1px solid #e5e7eb;padding:14px 16px;'
+        'font-size:13px;line-height:20px;color:#374151;">'
+        '<strong>Como leerlo:</strong> el centro es la brecha entre nuestro precio y la '
+        'competencia por modelo. Si estamos abajo, puede haber margen para subir; si '
+        'estamos arriba, conviene revisar competitividad antes de mover el precio.</div>'
+        '</td></tr>'
+        f'{"".join(brand_blocks)}'
+        '<tr><td style="padding:4px 24px 30px;text-align:center;">'
+        f'<a href="{h(GITHUB_PAGES_URL)}" target="_blank" '
+        'style="display:inline-block;background:#111827;color:#ffffff;'
+        'text-decoration:none;font-size:15px;font-weight:800;'
+        'padding:14px 26px;border-radius:5px;">Ver detalle completo</a>'
+        '<div style="margin-top:10px;font-size:12px;line-height:16px;color:#6b7280;">'
+        'Incluye busqueda, filtros por modelo, publicaciones y evolucion historica.</div>'
+        '</td></tr>'
+        '<tr><td style="background:#f9fafb;padding:16px 24px;text-align:center;'
+        'border-top:1px solid #e5e7eb;">'
+        '<p style="margin:0;font-size:11px;line-height:16px;color:#6b7280;">'
+        'La competencia prioriza concesionarias no propias; si no hay datos suficientes, '
+        'usa el resto de Mercado Libre. Promedios por moneda principal, sin mezclar pesos y dolares.</p>'
+        '</td></tr>'
+        '</table></td></tr></table></body></html>'
+    )
+
+
 def load_history():
     """Load the accumulated run history from data/history.json."""
     full_path = os.path.join(os.path.dirname(__file__), HISTORY_FILE)
@@ -1706,8 +1987,22 @@ def _compute_brand_stats(brand_name, grouped, items):
             continue
         dealer_entries = [e for e in entries if _is_dealer_listing(e)]
         private_entries = [e for e in entries if not _is_dealer_listing(e)]
+        own_entries = [e for e in entries if _is_own_listing(e, brand_name)]
+        competitor_entries = [e for e in entries if not _is_own_listing(e, brand_name)]
+        dealer_competitor_entries = [
+            e for e in competitor_entries if _is_dealer_listing(e)
+        ]
         dealer_stats = _dominant_price_stats(dealer_entries)
         private_stats = _dominant_price_stats(private_entries)
+        own_stats = _dominant_price_stats(own_entries)
+        competitor_stats = _dominant_price_stats(competitor_entries)
+        dealer_competitor_stats = _dominant_price_stats(dealer_competitor_entries)
+        if dealer_competitor_stats["count"]:
+            benchmark_stats = dealer_competitor_stats
+            benchmark_label = "competencia concesionaria"
+        else:
+            benchmark_stats = competitor_stats
+            benchmark_label = "mercado ML"
         models[model] = {
             "avg": price_stats["avg"],
             "min": price_stats["min"],
@@ -1727,6 +2022,30 @@ def _compute_brand_stats(brand_name, grouped, items):
             "private_currency": private_stats["currency"],
             "private_avg_label": private_stats["avg_label"],
             "private_range_label": private_stats["range_label"],
+            "own_count": len(own_entries),
+            "own_price_count": own_stats["count"],
+            "own_avg": own_stats["avg"],
+            "own_currency": own_stats["currency"],
+            "own_avg_label": own_stats["avg_label"],
+            "own_range_label": own_stats["range_label"],
+            "competitor_count": len(competitor_entries),
+            "competitor_price_count": competitor_stats["count"],
+            "competitor_avg": competitor_stats["avg"],
+            "competitor_currency": competitor_stats["currency"],
+            "competitor_avg_label": competitor_stats["avg_label"],
+            "competitor_range_label": competitor_stats["range_label"],
+            "dealer_competitor_count": len(dealer_competitor_entries),
+            "dealer_competitor_price_count": dealer_competitor_stats["count"],
+            "dealer_competitor_avg": dealer_competitor_stats["avg"],
+            "dealer_competitor_currency": dealer_competitor_stats["currency"],
+            "dealer_competitor_avg_label": dealer_competitor_stats["avg_label"],
+            "dealer_competitor_range_label": dealer_competitor_stats["range_label"],
+            "benchmark_avg": benchmark_stats["avg"],
+            "benchmark_currency": benchmark_stats["currency"],
+            "benchmark_avg_label": benchmark_stats["avg_label"],
+            "benchmark_range_label": benchmark_stats["range_label"],
+            "benchmark_count": benchmark_stats["count"],
+            "benchmark_label": benchmark_label,
             "count": len(entries),
             "n_up": sum(1 for e in entries if e.get("price_change") == "up"),
             "n_down": sum(1 for e in entries if e.get("price_change") == "down"),
@@ -1762,10 +2081,11 @@ def generate_brand_summary(brand_name, grouped, items, history):
     for model, s in stats["models"].items():
         model_lines.append(
             f"  - {model}: {s['count']} pub., "
-            f"promedio ML {s.get('avg_label') or fmt_price(s['avg'])}, "
-            f"rango {s.get('range_label') or (fmt_price(s['min']) + '-' + fmt_price(s['max']))}, "
-            f"concesionarias {s.get('dealer_count', 0)} pub. "
-            f"promedio {s.get('dealer_avg_label', '-')}, "
+            f"nuestro promedio {s.get('own_avg_label', '-')} "
+            f"({s.get('own_count', 0)} pub.), "
+            f"benchmark {s.get('benchmark_label', 'competencia')} "
+            f"{s.get('benchmark_avg_label', '-')} "
+            f"({s.get('benchmark_count', 0)} pub.), "
             f"{s['n_up']} subieron / {s['n_down']} bajaron / {s['n_new']} nuevas"
         )
     current_block = f"Total: {stats['total']} publicaciones\n" + "\n".join(model_lines)
@@ -1796,7 +2116,7 @@ def generate_brand_summary(brand_name, grouped, items, history):
     prompt = (
         f"Resumí en exactamente 2-3 oraciones cortas los datos de {brand_name} en Mercado Libre Argentina. "
         f"Sé directo y factual: mencioná el total de publicaciones, qué modelos lideran en volumen, "
-        f"cómo está el promedio de Mercado Libre frente a concesionarias por modelo, "
+        f"como estan nuestros precios frente a la competencia concesionaria por modelo, "
         f"y si hubo subas/bajas de precio relevantes respecto al historial. "
         f"Si no hay historial o no hubo cambios de precio, decilo en una frase y no especules. "
         f"Nada de bullet points, títulos ni análisis especulativos. Solo los hechos.\n\n"

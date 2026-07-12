@@ -141,3 +141,33 @@ BRANDS = {
         "card_color": "#1a237e",
     },
 }
+
+
+def _parse_seller_keywords(raw_value):
+    return [
+        value.strip().lower()
+        for value in str(raw_value or "").split(",")
+        if value.strip()
+    ]
+
+
+# Sellers treated as "our" listings in the benchmark email. Override globally with
+# OWN_SELLER_KEYWORDS, or per brand with OWN_SELLER_KEYWORDS_BAIC / _CHERY.
+_DEFAULT_OWN_SELLER_KEYWORDS = {
+    "BAIC": ["baic san jorge", "baic by one fan", "nationbaic"],
+    "Chery": [],
+}
+
+_GLOBAL_OWN_SELLER_KEYWORDS = _parse_seller_keywords(
+    os.environ.get("OWN_SELLER_KEYWORDS", "")
+)
+
+OWN_SELLER_KEYWORDS = {}
+for _brand_name in BRANDS:
+    _brand_env_key = f"OWN_SELLER_KEYWORDS_{_brand_name.upper()}"
+    _brand_keywords = _parse_seller_keywords(os.environ.get(_brand_env_key, ""))
+    OWN_SELLER_KEYWORDS[_brand_name] = (
+        _brand_keywords
+        or _GLOBAL_OWN_SELLER_KEYWORDS
+        or _DEFAULT_OWN_SELLER_KEYWORDS.get(_brand_name, [])
+    )
